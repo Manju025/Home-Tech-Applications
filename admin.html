@@ -189,77 +189,81 @@
             `).join('');
         }
 
-        async function addNewProduct(formData) { // Make it async
+        async function addNewProduct(formData) {
             const selectedTechnologies = [];
-            // ... (existing technology selection and validation) ...
-
+            document.querySelectorAll('#technologyCheckboxes input[type="checkbox"]:checked')
+                .forEach(checkbox => selectedTechnologies.push(checkbox.value));
+        
+            if (selectedTechnologies.length === 0) {
+                alert('Please select at least one technology.');
+                return;
+            }
+        
             const productImageInput = document.getElementById('productImageFile');
             const imageFile = productImageInput.files[0];
-            let imageUrl = PLACEHOLDER;
-
-            if (imageFile) {
-                // ... (existing FileReader logic) ...
-                const reader = new FileReader();
-                reader.onload = async function(e) { // Make inner function async too
-                    imageUrl = e.target.result;
-
-                    const newProduct = {
-                        id: Date.now(),
-                        name: formData.get('productName'),
-                        price: parseInt(formData.get('productPrice')),
-                        image: imageUrl,
-                        tags: selectedTechnologies,
-                        isNewLaunch: formData.get('isNewLaunch') === 'on'
+            let imageUrl = PLACEHOLDER; // Use a placeholder
+        
+            const processImage = new Promise((resolve, reject) => {
+                if (imageFile) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        resolve(e.target.result);
                     };
-
-                    try {
-                        const response = await fetch(`${API_BASE_URL}/products`, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify(newProduct)
-                        });
-                        if (!response.ok) throw new Error('Failed to add product');
-                        const addedProduct = await response.json(); // Get the saved product from response
-                        products.push(addedProduct); // Add to local array if needed, but re-fetching is safer
-                        showNotification('Product added successfully!', 'success');
-
-                        const addProcutForm = document.getElementById('addProductForm');
-                        addproductForm.reset();
-                        
-                        await fetchProductsAdmin(); // Re-fetch all products to ensure UI is up-to-date
-                    } catch (error) {
-                        console.error("Error adding product:", error);
-                        showNotification('Error adding product: ' + error.message, 'error');
-                    }
-                };
-                reader.readAsDataURL(imageFile);
-            } else {
-                // ... (existing logic for placeholder image) ...
+                    reader.onerror = function() {
+                        reject(new Error('Error reading file'));
+                    };
+                    reader.readAsDataURL(imageFile);
+                } else {
+                    resolve(imageUrl);
+                }
+            });
+        
+            try {
+                imageUrl = await processImage;
+        
                 const newProduct = {
-                    id: Date.now(),
                     name: formData.get('productName'),
                     price: parseInt(formData.get('productPrice')),
                     image: imageUrl,
                     tags: selectedTechnologies,
                     isNewLaunch: formData.get('isNewLaunch') === 'on'
                 };
-
-                try {
-                    const response = await fetch(`${API_BASE_URL}/products`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(newProduct)
-                    });
-                    if (!response.ok) throw new Error('Failed to add product');
-                    const addedProduct = await response.json();
-                    products.push(addedProduct);
-                    showNotification('Product added successfully!', 'success');
-                    // ... (reset form fields) ...
-                    await fetchProductsAdmin(); // Re-fetch
-                } catch (error) {
-                    console.error("Error adding product:", error);
-                    showNotification('Error adding product: ' + error.message, 'error');
+                
+                const response = await fetch(`${API_BASE_URL}/products`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(newProduct)
+                });
+        
+                if (!response.ok) throw new Error('Failed to add product');
+                
+                const addedProduct = await response.json();
+                
+                showNotification('Product added successfully!', 'success');
+                
+                // --- START: Code to reset the form ---
+                const addProductForm = document.getElementById('addProductForm');
+                addProductForm.reset(); // Reset all form inputs to their initial state.
+                
+                // Clear the image preview and hint text
+                const previewBox = document.getElementById('imagePreview');
+                if (previewBox) previewBox.style.display = 'none';
+                
+                const hint = document.getElementById('imageHint');
+                if (hint) {
+                    hint.textContent = 'Upload image (PNG/JPG < 5 MB)';
+                    hint.style.color = 'var(--color-text-secondary)';
                 }
+                
+                // Manually reset checkboxes as form.reset() might not clear them reliably
+                document.querySelectorAll('#technologyCheckboxes input[type="checkbox"]').forEach(cb => cb.checked = false);
+                // --- END: Code to reset the form ---
+        
+                await fetchProductsAdmin();
+                
+            } catch (error) {
+                console.error("Error adding product:", error);
+                showNotification('Error adding product: ' + error.message, 'error');
             }
         }
 
