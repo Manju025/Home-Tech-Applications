@@ -190,6 +190,7 @@
         }
 
         async function addNewProduct(formData) {
+            const addProductForm = document.getElementById('addProductForm');
             const selectedTechnologies = [];
             document.querySelectorAll('#technologyCheckboxes input[type="checkbox"]:checked')
                 .forEach(checkbox => selectedTechnologies.push(checkbox.value));
@@ -201,8 +202,9 @@
         
             const productImageInput = document.getElementById('productImageFile');
             const imageFile = productImageInput.files[0];
-            let imageUrl = PLACEHOLDER; // Use a placeholder
+            let imageUrl = PLACEHOLDER;
         
+            // Use a Promise to handle the file reading asynchronously
             const processImage = new Promise((resolve, reject) => {
                 if (imageFile) {
                     const reader = new FileReader();
@@ -241,8 +243,7 @@
                 
                 showNotification('Product added successfully!', 'success');
                 
-                // --- START: Code to reset the form ---
-                const addProductForm = document.getElementById('addProductForm');
+                // --- START: Reset Form Code ---
                 addProductForm.reset(); // Reset all form inputs to their initial state.
                 
                 // Clear the image preview and hint text
@@ -255,9 +256,9 @@
                     hint.style.color = 'var(--color-text-secondary)';
                 }
                 
-                // Manually reset checkboxes as form.reset() might not clear them reliably
+                // Manually reset checkboxes
                 document.querySelectorAll('#technologyCheckboxes input[type="checkbox"]').forEach(cb => cb.checked = false);
-                // --- END: Code to reset the form ---
+                // --- END: Reset Form Code ---
         
                 await fetchProductsAdmin();
                 
