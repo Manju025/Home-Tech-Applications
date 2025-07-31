@@ -200,11 +200,26 @@
                 return;
             }
         
+            const newProductName = formData.get('productName').trim();
+            const newProductTags = selectedTechnologies.sort(); // Sort for consistent comparison
+        
+            // --- START: New validation logic ---
+            const productExists = products.some(product => {
+                const existingTags = product.tags.slice().sort(); // Sort for consistent comparison
+                const areTagsSame = JSON.stringify(newProductTags) === JSON.stringify(existingTags);
+                return product.name.trim().toLowerCase() === newProductName.toLowerCase() && areTagsSame;
+            });
+        
+            if (productExists) {
+                showNotification(`${newProductName} is already added with these technologies. Try with different options.`, 'error');
+                return; // Stop the function from proceeding
+            }
+            // --- END: New validation logic ---
+        
             const productImageInput = document.getElementById('productImageFile');
             const imageFile = productImageInput.files[0];
             let imageUrl = PLACEHOLDER;
         
-            // Use a Promise to handle the file reading asynchronously
             const processImage = new Promise((resolve, reject) => {
                 if (imageFile) {
                     const reader = new FileReader();
@@ -224,7 +239,7 @@
                 imageUrl = await processImage;
         
                 const newProduct = {
-                    name: formData.get('productName'),
+                    name: newProductName,
                     price: parseInt(formData.get('productPrice')),
                     image: imageUrl,
                     tags: selectedTechnologies,
@@ -243,10 +258,8 @@
                 
                 showNotification('Product added successfully!', 'success');
                 
-                // --- START: Reset Form Code ---
-                addProductForm.reset(); // Reset all form inputs to their initial state.
+                addProductForm.reset();
                 
-                // Clear the image preview and hint text
                 const previewBox = document.getElementById('imagePreview');
                 if (previewBox) previewBox.style.display = 'none';
                 
@@ -256,9 +269,7 @@
                     hint.style.color = 'var(--color-text-secondary)';
                 }
                 
-                // Manually reset checkboxes
                 document.querySelectorAll('#technologyCheckboxes input[type="checkbox"]').forEach(cb => cb.checked = false);
-                // --- END: Reset Form Code ---
         
                 await fetchProductsAdmin();
                 
