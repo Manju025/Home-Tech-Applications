@@ -356,7 +356,7 @@
                 if (!response.ok) throw new Error('Failed to update order status');
 
                 showNotification(`Order #${orderId} marked as Done!`, 'success');
-                await Admin(); // Re-fetch to update UI
+                await fetchOrdersAdmin(); // Re-fetch to update UI
             } catch (error) {
                 console.error("Error marking order as done:", error);
                 showNotification('Error updating order status: ' + error.message, 'error');
