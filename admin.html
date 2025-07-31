@@ -106,8 +106,7 @@
         }
 
         // Admin Application Data
-        let products = JSON.parse(localStorage.getItem('products')) || [
-        ];
+        let products = [];
 
         const availableTags = ["RO", "UV", "UF", "Alkaline", "Copper", "Smart", "Multi-Stage", "TDS Controller"];
         let orders = [];
@@ -119,11 +118,6 @@
             renderTechnologyCheckboxes();
             renderProductsAdmin();
             renderOrdersList();
-            
-            // Save initial products to localStorage if not exists
-            //if (!localStorage.getItem('products')) {
-            //    localStorage.setItem('products', JSON.stringify(products));
-            //}
         }
         async function fetchProductsAdmin() {
             try {
