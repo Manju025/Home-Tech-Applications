@@ -279,6 +279,7 @@
             }
         }
 
+        // Replace your existing renderProductsAdmin function with this
         function renderProductsAdmin() {
             const container = document.getElementById('productsAdminGrid');
         
@@ -312,9 +313,10 @@
                 `;
             }).join('');
         }
-
+        
+        // Replace your existing deleteProduct function with this
         async function deleteProduct(productId) {
-    // Add this check to prevent API calls with undefined or invalid IDs
+            // Add this check to prevent API calls with undefined or invalid IDs
             if (!productId || isNaN(productId)) {
                 console.error("Error: Attempted to delete a product with an invalid ID.");
                 showNotification('Error: Invalid product ID.', 'error');
