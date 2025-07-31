@@ -6,7 +6,7 @@ const API_BASE_URL = 'https://home-tech-backend.onrender.com/api'; // Change to 
 
 const allTags = ["RO", "UV", "UF", "Alkaline", "Copper", "Smart", "Multi-Stage", "TDS Controller"];
 
-let orders = JSON.parse(localStorage.getItem('orders')) || [];
+let orders = [];
 let activeFilters = [];
 let currentProduct = null;
 let isAdminMode = false;
@@ -570,7 +570,7 @@ function setupFormEvents() {
     if (orderForm) {
         orderForm.addEventListener('submit', function(e) {
             e.preventDefault();
-            processOrder(new FormData(this));
+            processOrder();
         });
     }
 }
@@ -596,7 +596,6 @@ function processOrder(formData) {
     };
     
     orders.push(orderData);
-    localStorage.setItem('orders', JSON.stringify(orders));
     
     // Close order modal
     closeModal('orderModal');
