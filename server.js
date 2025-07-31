@@ -9,7 +9,6 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 const MONGO_URI = process.env.MONGO_URI;
 
-app.options('*', cors());
 // Middleware
 app.use(express.json({limit: "10mb"}));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
@@ -19,6 +18,7 @@ app.use(cors({
   allowedHeaders: ['Content-Type'],
 }));
 
+app.options('*', cors());
 
 // Connect to MongoDB
 mongoose.connect(MONGO_URI)
