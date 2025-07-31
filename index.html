@@ -1,641 +1,327 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home Tech Applications</title>
-    <style>
-        :root {
-            --color-primary: #2563eb;
-            --color-primary-hover: #1d4ed8;
-            --color-secondary: #64748b;
-            --color-success: #10b981;
-            --color-error: #ef4444;
-            --color-warning: #f59e0b;
-            --color-text: #1f2937;
-            --color-text-secondary: #6b7280;
-            --color-bg: #ffffff;
-            --color-bg-secondary: #f8fafc;
-            --color-border: #e5e7eb;
-            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
-        }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            line-height: 1.6;
-            color: var(--color-text);
-            background-color: var(--color-bg);
-        }
-
-        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
-        
-        /* Header */
-        .header {
-            background: var(--color-bg);
-            box-shadow: var(--shadow-sm);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-        .nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1rem 0;
-        }
-
-        .logo {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: var(--color-primary);
-            text-decoration: none;
-        }
-
-        .nav-links {
-            display: flex;
-            list-style: none;
-            gap: 2rem;
-        }
-
-        .nav-links a {
-            text-decoration: none;
-            color: var(--color-text);
-            font-weight: 500;
-            transition: color 0.3s;
-        }
-
-        .nav-links a:hover { color: var(--color-primary); }
-
-        .mobile-menu-btn {
-            display: none;
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-        }
-
-        /* Hero Section */
-        .hero {
-            background: linear-gradient(135deg, var(--color-primary), #3b82f6);
-            color: white;
-            text-align: center;
-            padding: 4rem 0;
-        }
-
-        .hero h1 { font-size: 2.5rem; margin-bottom: 1rem; }
-        .hero p { font-size: 1.2rem; opacity: 0.9; }
-
-        /* Sections */
-        .section { padding: 4rem 0; }
-        .section h2 {
-            text-align: center;
-            font-size: 2rem;
-            margin-bottom: 3rem;
-            color: var(--color-text);
-        }
-
-        /* Product Grid */
-        .products-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-            margin-bottom: 2rem;
-        }
-
-        .product-card {
-            background: var(--color-bg);
-            border-radius: 12px;
-            box-shadow: var(--shadow-md);
-            overflow: hidden;
-            cursor: pointer;
-            transition: transform 0.3s, box-shadow 0.3s;
-        }
-
-        .product-card:hover {
-            transform: translateY(-4px);
-            box-shadow: var(--shadow-lg);
-        }
-
-        .product-image {
-            position: relative;
-            width: 100%;
-            height: 200px;
-            overflow: hidden;
-        }
-
-        .product-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .new-badge {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: var(--color-error);
-            color: white;
-            padding: 0.25rem 0.5rem;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: bold;
-        }
-
-        .product-info {
-            padding: 1.5rem;
-        }
-
-        .product-name {
-            font-size: 1.25rem;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-        }
-
-        .product-price {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: var(--color-primary);
-            margin-bottom: 1rem;
-        }
-
-        .product-tags {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-        }
-
-        .tag {
-            background: var(--color-bg-secondary);
-            color: var(--color-text-secondary);
-            padding: 0.25rem 0.5rem;
-            border-radius: 16px;
-            font-size: 0.75rem;
-            font-weight: 500;
-        }
-
-        /* Filter Section */
-        .filter-section {
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-
-        .filter-tags {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 1rem;
-            margin-bottom: 1rem;
-        }
-
-        .filter-tag {
-            background: var(--color-bg-secondary);
-            color: var(--color-text);
-            border: 2px solid var(--color-border);
-            padding: 0.5rem 1rem;
-            border-radius: 25px;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-weight: 500;
-        }
-
-        .filter-tag:hover, .filter-tag.active {
-            background: var(--color-primary);
-            color: white;
-            border-color: var(--color-primary);
-        }
-
-        .clear-filters {
-            background: var(--color-secondary);
-            color: white;
-            border: none;
-            padding: 0.5rem 1rem;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 500;
-            transition: background 0.3s;
-        }
-
-        .clear-filters:hover {
-            background: #475569;
-        }
-
-        /* Modal Styles */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(4px);
-        }
-
-        .modal-content {
-            background-color: var(--color-bg);
-            margin: 5% auto;
-            padding: 0;
-            border-radius: 12px;
-            width: 90%;
-            max-width: 600px;
-            max-height: 90vh;
-            overflow-y: auto;
-            box-shadow: var(--shadow-lg);
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1.5rem;
-            border-bottom: 1px solid var(--color-border);
-        }
-
-        .modal-body {
-            padding: 1.5rem;
-        }
-
-        .close {
-            color: var(--color-text-secondary);
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
-            line-height: 1;
-        }
-
-        .close:hover { color: var(--color-text); }
-
-        .modal-product-image {
-            width: 100%;
-            height: 250px;
-            object-fit: cover;
-            border-radius: 8px;
-            margin-bottom: 1rem;
-        }
-
-        /* Form Styles */
-        .form-group {
-            margin-bottom: 1rem;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 500;
-            color: var(--color-text);
-        }
-
-        .form-group input, .form-group textarea, .form-group select {
-            width: 100%;
-            padding: 0.75rem;
-            border: 2px solid var(--color-border);
-            border-radius: 6px;
-            font-size: 1rem;
-            transition: border-color 0.3s;
-        }
-
-        .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
-            outline: none;
-            border-color: var(--color-primary);
-        }
-
-        .btn-primary, .btn-secondary, .btn-danger {
-            padding: 0.75rem 1.5rem;
-            border: none;
-            border-radius: 6px;
-            font-size: 1rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: background-color 0.3s;
-            text-decoration: none;
-            display: inline-block;
-            text-align: center;
-        }
-
-        .btn-primary {
-            background: var(--color-primary);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: var(--color-primary-hover);
-        }
-
-        .btn-secondary {
-            background: var(--color-secondary);
-            color: white;
-        }
-
-        .btn-danger {
-            background: var(--color-error);
-            color: white;
-        }
-
-        /* Notification */
-        .notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 1rem 1.5rem;
-            border-radius: 6px;
-            color: white;
-            font-weight: 500;
-            z-index: 2000;
-            transform: translateX(400px);
-            transition: transform 0.3s;
-        }
-
-        .notification.show {
-            transform: translateX(0);
-        }
-
-        .notification.success {
-            background: var(--color-success);
-        }
-
-        .notification.error {
-            background: var(--color-error);
-        }
-
-        /* About Section */
-        .about {
-            background: var(--color-bg-secondary);
-        }
-
-        .about-content {
-            text-align: center;
-            max-width: 800px;
-            margin: 0 auto;
-        }
-
-        .features {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 2rem;
-            margin-top: 3rem;
-        }
-
-        .feature {
-            background: var(--color-bg);
-            padding: 2rem;
-            border-radius: 12px;
-            text-align: center;
-            box-shadow: var(--shadow-sm);
-        }
-
-        .feature h4 {
-            color: var(--color-primary);
-            margin-bottom: 1rem;
-        }
-
-        /* Footer */
-        .footer {
-            background: var(--color-text);
-            color: white;
-            padding: 3rem 0;
-        }
-
-        .footer-content {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 2rem;
-        }
-
-        .footer-section h4 {
-            margin-bottom: 1rem;
-            color: var(--color-primary);
-        }
-
-        .footer-section p, .footer-section a {
-            color: #d1d5db;
-            text-decoration: none;
-            margin-bottom: 0.5rem;
-            display: block;
-        }
-
-        .footer-section a:hover {
-            color: white;
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .nav-links {
-                display: none;
-                position: absolute;
-                top: 100%;
-                left: 0;
-                width: 100%;
-                background: var(--color-bg);
-                flex-direction: column;
-                padding: 1rem;
-                box-shadow: var(--shadow-md);
-            }
-
-            .nav-links.active {
-                display: flex;
-            }
-
-            .mobile-menu-btn {
-                display: block;
-            }
-
-            .hero h1 {
-                font-size: 2rem;
-            }
-
-            .products-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .modal-content {
-                width: 95%;
-                margin: 2% auto;
-            }
-
-            .filter-tags {
-                justify-content: flex-start;
-                overflow-x: auto;
-                padding-bottom: 0.5rem;
-            }
-
-            .filter-tag {
-                white-space: nowrap;
-            }
-        }
-    </style>
-</head>
-<body>
-    <!-- Header -->
-    <header class="header">
-        <nav class="nav container">
-            <a href="#" class="logo">Home Tech</a>
-            <ul class="nav-links" id="mainNav">
-                <li><a href="#home">Home</a></li>
-                <li><a href="#products">Products</a></li>
-                <li><a href="#about">About</a></li>
-                <li><a href="#contact">Contact</a></li>
-            </ul>
-            <button class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
-        </nav>
-    </header>
-
-    <!-- Hero Section -->
-    <section class="hero" id="home">
-        <div class="container">
-            <h1>Leading Water Purification Solutions</h1>
-            <p>Advanced mixed technology purifiers for safe, healthy drinking water in Hyderabad</p>
-        </div>
-    </section>
-
-    <!-- Main Content -->
-    <main class="main">
-        <!-- New Launches Section -->
-        <section class="section">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Home Tech Applications - Water Purifiers</title>
+        <link rel="icon" href="icon.jpg" type="image/jpeg">
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <body>
+        <!-- Header -->
+        <header class="header">
             <div class="container">
-                <h2>🆕 Newly Launched Products</h2>
-                <div class="products-grid" id="newLaunchesGrid">
-                    <!-- New products will be dynamically loaded here -->
-                </div>
-            </div>
-        </section>
+                <div class="header__content">
+                    <div class="header__logo">
+                        <img src="icon.png" alt="Home Tech Applications"
+                            class="logo-img">
+                        <span class="logo-text">Home Tech Applications</span>
+                    </div>
 
-        <!-- Products Section -->
-        <section class="section" id="products">
-            <div class="container">
-                <h2>Our Mixed Technology Purifiers</h2>
-                
-                <!-- Filter Section -->
-                <div class="filter-section">
-                    <h3>Filter by Technology:</h3>
-                    <div class="filter-tags" id="filterTags">
-                        <!-- Filter tags will be dynamically loaded here -->
-                    </div>
-                    <button class="clear-filters" id="clearFilters">Clear Filters</button>
-                </div>
-
-                <div class="products-grid" id="productsGrid">
-                    <!-- Products will be dynamically loaded here -->
-                </div>
-            </div>
-        </section>
-
-        <!-- About Section -->
-        <section class="section about" id="about">
-            <div class="container">
-                <div class="about-content">
-                    <h2>About Our Hyderabad Branch</h2>
-                    <p>Home Tech Applications has been a trusted name in water purification since 2018. We specialize in mixed technology water purifiers that combine RO, UV, UF, and advanced features like alkaline boost and copper technology.</p>
-                    <p>Our Hyderabad branch serves customers across Telangana and Andhra Pradesh with cutting-edge water purification solutions that ensure safe, healthy drinking water for your family.</p>
-                    
-                    <div class="features">
-                        <div class="feature">
-                            <h4>🔬 Advanced Technology</h4>
-                            <p>Multi-stage purification systems with the latest innovations</p>
-                        </div>
-                        <div class="feature">
-                            <h4>✅ Quality Assurance</h4>
-                            <p>Certified products with comprehensive warranty coverage</p>
-                        </div>
-                        <div class="feature">
-                            <h4>🛠️ Expert Support</h4>
-                            <p>Professional installation & dedicated customer service</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-    </main>
-
-    <!-- Product Modal -->
-    <div id="productModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Product Details</h2>
-                <span class="close" onclick="closeProductModal()">&times;</span>
-            </div>
-            <div class="modal-body">
-                <img id="modalProductImage" class="modal-product-image" src="" alt="">
-                <h3 id="modalProductName"></h3>
-                <p id="modalProductPrice" class="product-price"></p>
-                <div id="modalProductTags" class="product-tags"></div>
-                <button class="btn-primary" onclick="openOrderModal()" style="margin-top: 1rem; width: 100%;">
-                    🛒 Order Now
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Order Modal -->
-    <div id="orderModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Place Your Order</h2>
-                <span class="close" onclick="closeOrderModal()">&times;</span>
-            </div>
-            <div class="modal-body">
-                <form id="orderForm">
-                    <div class="form-group">
-                        <label for="quantity">Quantity:</label>
-                        <input type="number" id="quantity" name="quantity" min="1" value="1" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="customerName">Full Name:</label>
-                        <input type="text" id="customerName" name="customerName" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="customerPhone">Phone Number:</label>
-                        <input type="tel" id="customerPhone" name="customerPhone" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="customerAddress">Address:</label>
-                        <textarea id="customerAddress" name="customerAddress" rows="3" required></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label for="specialInstructions">Special Instructions (Optional):</label>
-                        <textarea id="specialInstructions" name="specialInstructions" rows="2"></textarea>
-                    </div>
-                    <button type="submit" class="btn-primary" style="width: 100%;">
-                        📋 Place Order
+                    <!-- Mobile menu button -->
+                    <button class="mobile-menu-btn" id="mobileMenuBtn">
+                        <span></span>
+                        <span></span>
+                        <span></span>
                     </button>
-                </form>
-            </div>
-        </div>
-    </div>
 
-    <!-- Footer -->
-    <footer class="footer" id="contact">
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-section">
-                    <h4>📍 Visit Our Branch</h4>
-                    <p>Home Tech Applications</p>
-                    <p>Hyderabad, Telangana</p>
-                    <p>India</p>
-                </div>
-                <div class="footer-section">
-                    <h4>📞 Call Us</h4>
-                    <p>+91 98765 43210</p>
-                    <p>Mon-Sat: 9:00 AM - 7:00 PM</p>
-                </div>
-                <div class="footer-section">
-                    <h4>✉️ Email Us</h4>
-                    <a href="mailto:info@hometechapplications.com">info@hometechapplications.com</a>
-                    <a href="mailto:support@hometechapplications.com">support@hometechapplications.com</a>
+                    <!-- Navigation -->
+                    <nav class="nav" id="mainNav">
+                        <a href="#home" class="nav__link">Home</a>
+                        <a href="#products" class="nav__link">Products</a>
+                        <a href="#about" class="nav__link">About</a>
+                        <a href="#career" class="nav__link">Careers</a>
+                        <a href="#contact" class="nav__link">Contact</a>
+                        <a href="./admin.html" class="nav__link">Admin Panel</a>
+                    </nav>
                 </div>
             </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main">
+            <!-- Hero Section -->
+            <section class="hero" id="home">
+                <div class="container">
+                    <div class="hero__content">
+                        <h1 class="hero__title">Welcome to Home Tech
+                            Applications</h1>
+                        <p class="hero__subtitle">Leading provider of advanced
+                            water purification solutions in Hyderabad,
+                            Telangana</p>
+                        <div class="hero__stats">
+                            <div class="stat">
+                                <span class="stat__number">15+</span>
+                                <span class="stat__label">Branches</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat__number">2018</span>
+                                <span class="stat__label">Established</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat__number">Mixed Tech</span>
+                                <span class="stat__label">Specialization</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- New Launches Section -->
+            <section class="section" id="new-launches">
+                <div class="container">
+                    <h2 class="section__title">Newly Launched Products</h2>
+                    <div class="products-grid" id="newLaunchesGrid">
+                        <!-- Products will be populated by JavaScript -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- All Products Section -->
+            <section class="section" id="products">
+                <div class="container">
+                    <div class="section__header">
+                        <h2 class="section__title">Our Mixed Technology
+                            Purifiers</h2>
+                        <div class="filters">
+                            <h3 class="filters__title">Filter by
+                                Technology:</h3>
+                            <div class="filters__tags" id="filterTags">
+                                <!-- Filter tags will be populated by JavaScript -->
+                            </div>
+                            <button class="btn btn--outline btn--sm"
+                                id="clearFilters">Clear All</button>
+                        </div>
+                    </div>
+                    <div class="products-grid" id="productsGrid">
+                        <!-- Products will be populated by JavaScript -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- About Section -->
+            <section class="section section--bg" id="about">
+                <div class="container">
+                    <h2 class="section__title">About Our Hyderabad Branch</h2>
+                    <div class="about__content">
+                        <div class="about__text">
+                            <p>Home Tech Applications has been a trusted name in
+                                water purification since 2018. We specialize in
+                                mixed technology water purifiers that combine
+                                RO, UV, UF, and advanced features like alkaline
+                                boost and copper technology.</p>
+                            <p>Our Hyderabad branch serves customers across
+                                Telangana and Andhra Pradesh with cutting-edge
+                                water purification solutions that ensure safe,
+                                healthy drinking water for your family.</p>
+                            <p>We are committed to providing the highest quality
+                                products with professional installation and
+                                comprehensive after-sales service to ensure your
+                                complete satisfaction.</p>
+                        </div>
+                        <div class="about__features">
+                            <div class="feature">
+                                <h4>Advanced Technology</h4>
+                                <p>Multi-stage purification systems with the
+                                    latest innovations</p>
+                            </div>
+                            <div class="feature">
+                                <h4>Quality Assurance</h4>
+                                <p>Certified products with comprehensive
+                                    warranty coverage</p>
+                            </div>
+                            <div class="feature">
+                                <h4>Expert Support</h4>
+                                <p>Professional installation & dedicated
+                                    customer service</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Contact Section -->
+            <section class="section" id="contact">
+                <div class="container">
+                    <h2 class="section__title">Contact Us</h2>
+                    <div class="contact__content">
+                        <div class="contact__info">
+                            <div class="contact__item">
+                                <h4>Visit Our Branch</h4>
+                                <p>Home Tech Applications<br>
+                                    Hyderabad, Telangana<br>
+                                    India</p>
+                            </div>
+                            <div class="contact__item">
+                                <h4>Call Us</h4>
+                                <p>+91 98765 43210<br>
+                                    Mon-Sat: 9:00 AM - 7:00 PM</p>
+                            </div>
+                            <div class="contact__item">
+                                <h4>Email Us</h4>
+                                <p>info@hometechapplications.com<br>
+                                    support@hometechapplications.com</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer" id="career">
+            <div class="container">
+                <div class="footer__content">
+                    <div class="footer__section">
+                        <h3 class="footer__title">Home Tech Applications</h3>
+                        <p>Leading provider of advanced water purification
+                            solutions</p>
+                        <p>📍 Hyderabad, Telangana</p>
+                        <div class="footer__links">
+                            <a href="#home">Home</a>
+                            <a href="#products">Products</a>
+                            <a href="#about">About</a>
+                            <a href="#contact">Contact</a>
+                        </div>
+                    </div>
+
+                    <div class="footer__section">
+                        <h3 class="footer__title">Career Opportunities</h3>
+                        <div class="career-posting">
+                            <h4 class="career__position">Branch Manager -
+                                Sub-Branch Management</h4>
+                            <p class="career__description">Join our growing
+                                team! We are looking for experienced
+                                professionals to manage and oversee operations
+                                of sub-branch locations.</p>
+                            <div class="career__requirements">
+                                <strong>Requirements:</strong>
+                                <ul>
+                                    <li>3+ years experience in branch
+                                        management</li>
+                                    <li>Strong leadership and communication
+                                        skills</li>
+                                    <li>Technical knowledge of water purifiers
+                                        preferred</li>
+                                    <li>Bachelor's degree in Business or related
+                                        field</li>
+                                </ul>
+                            </div>
+                            <p class="career__contact">
+                                📧 <a
+                                    href="mailto:careers@hometechapplications.com">careers@hometechapplications.com</a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="footer__bottom">
+                    <p>&copy; 2025 Home Tech Applications. All rights
+                        reserved.</p>
+                </div>
+            </div>
+        </footer>
+
+        <!-- Product Detail Modal -->
+        <div class="modal hidden" id="productModal">
+            <div class="modal__overlay" id="modalOverlay"></div>
+            <div class="modal__content">
+                <button class="modal__close" id="modalClose">&times;</button>
+                <div class="modal__body" id="modalBody">
+                    <!-- Product details will be populated by JavaScript -->
+                </div>
+            </div>
         </div>
-    </footer>
 
-    <!-- Notification -->
-    <div id="notification" class="notification"></div>
+        <!-- Order Modal -->
+        <div class="modal hidden" id="orderModal">
+            <div class="modal__overlay" id="orderModalOverlay"></div>
+            <div class="modal__content">
+                <button class="modal__close"
+                    id="orderModalClose">&times;</button>
+                <div class="modal__body">
+                    <h3>Place Your Order</h3>
+                    <form id="orderForm" class="order-form">
+                        <div class="form-group">
+                            <label class="form-label">Full Name *</label>
+                            <input type="text" name="customerName"
+                                class="form-control" required>
+                            <label class="form-label" for="customerName">Full
+                                Name *</label>
+                            <input type="text" id="customerName"
+                                name="customerName" class="form-control"
+                                required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Phone Number *</label>
+                            <input type="tel" name="customerPhone"
+                                class="form-control" required>
+                            <label class="form-label" for="customerPhone">Phone
+                                Number *</label>
+                            <input type="tel" id="customerPhone"
+                                name="customerPhone" class="form-control"
+                                required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Address *</label>
+                            <textarea name="customerAddress"
+                                class="form-control" rows="3"
+                                required></textarea>
+                            <label class="form-label"
+                                for="customerAddress">Address *</label>
+                            <textarea name="customerAddress"
+                                id="customerAddress" class="form-control"
+                                rows="3" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Quantity</label>
+                            <select name="quantity" class="form-control">
+                                <label class="form-label"
+                                    for="quantity">Quantity</label>
+                                <select name="quantity" id="quantity"
+                                    class="form-control">
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                    <option value="4">4</option>
+                                    <option value="5">5</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Special
+                                    Instructions</label>
+                                <textarea name="specialInstructions"
+                                    class="form-control" rows="2"
+                                    placeholder="Any special delivery instructions..."></textarea>
+                                <label class="form-label"
+                                    for="specialInstructions">Special
+                                    Instructions</label>
+                                <textarea name="specialInstructions"
+                                    id="specialInstructions"
+                                    class="form-control" rows="2"
+                                    placeholder="Any special delivery instructions..."></textarea>
+                            </div>
+                            <div class="order-summary" id="orderSummary">
+                                <!-- Order summary will be populated -->
+                            </div>
+                            <button type="submit"
+                                class="btn btn--primary btn--full-width">Confirm
+                                Order</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
 
-    <!-- JavaScript -->
-    <script src="app.js"></script>
-</body>
-</html>
+            <!-- Notification -->
+            <div class="notification hidden" id="notification">
+                <div class="notification__content">
+                    <span class="notification__message"
+                        id="notificationMessage"></span>
+                    <button class="notification__close"
+                        id="notificationClose">&times;</button>
+                </div>
+            </div>
+
+            <script src="app.js"></script>
+        </body>
+    </html>
