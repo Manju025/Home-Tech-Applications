@@ -638,7 +638,7 @@ async function placeOrder() { // Make it async
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(orderDetails)
         });
-        console.log("Sending order to backend: ", orderDetails):
+        console.log(`Sending order to backend = ${orderDetails}`):
         if (!response.ok) throw new Error('Failed to place order');
 
         showNotification('Order placed successfully! We will contact you soon.', 'success');
