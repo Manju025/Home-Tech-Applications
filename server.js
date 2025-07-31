@@ -18,6 +18,9 @@ app.use(cors({
   allowedHeaders: ['Content-Type'],
 }));
 
+app.options('*', cors());
+
+
 // Connect to MongoDB
 mongoose.connect(MONGO_URI)
   .then(() => console.log('✅ MongoDB connected successfully'))
