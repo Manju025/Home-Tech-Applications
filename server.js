@@ -9,16 +9,25 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 const MONGO_URI = process.env.MONGO_URI;
 
-// Middleware
-app.use(express.json({limit: "10mb"}));
-app.use(express.urlencoded({ limit: '10mb', extended: true }));
+// ✅ Better CORS setup for Netlify frontend
 app.use(cors({
-  origin: 'https://hometechapp.netlify.app',
+  origin: function (origin, callback) {
+    const allowedOrigins = ['https://hometechapp.netlify.app'];
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('CORS not allowed for this origin'));
+    }
+  },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type'],
+  credentials: true,
 }));
 
-app.options('*', cors());
+app.options('*', cors()); // Handle preflight requests
+
+// Middleware
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
 // Connect to MongoDB
 mongoose.connect(MONGO_URI)
