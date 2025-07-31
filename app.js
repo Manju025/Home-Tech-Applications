@@ -570,7 +570,7 @@ function setupFormEvents() {
     if (orderForm) {
         orderForm.addEventListener('submit', function(e) {
             e.preventDefault();
-            processOrder();
+            processOrder(new FormData(this));
         });
     }
 }
