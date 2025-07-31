@@ -12,7 +12,10 @@ const MONGO_URI = process.env.MONGO_URI;
 // Middleware
 app.use(express.json({limit: "10mb"));
 app.use(cors({
-  origin: 'https://hometechapp.netlify.app'
+  origin: 'https://hometechapp.netlify.app',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type'],
+  credentials: true
 }));
 
 // Connect to MongoDB
