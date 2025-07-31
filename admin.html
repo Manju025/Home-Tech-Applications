@@ -281,28 +281,36 @@
 
         function renderProductsAdmin() {
             const container = document.getElementById('productsAdminGrid');
-            
+        
             if (products.length === 0) {
                 container.innerHTML = '<p style="text-align: center; color: var(--color-text-secondary);">No products available.</p>';
                 return;
             }
-
-            container.innerHTML = products.map(product => `
-                <div class="product-admin-card">
-                    <div class="product-admin-card__actions">
-                        <button class="btn-delete" onclick="deleteProduct(${product.id})">Delete</button>
+        
+            container.innerHTML = products.map(product => {
+                // Ensure product.id is a valid number before rendering the button
+                const productId = product.id;
+                const deleteButton = productId ?
+                    `<button class="btn-delete" onclick="deleteProduct(${productId})">Delete</button>` :
+                    '<button class="btn-delete" disabled title="Product ID missing">Delete</button>';
+        
+                return `
+                    <div class="product-admin-card">
+                        <div class="product-admin-card__actions">
+                            ${deleteButton}
+                        </div>
+                        <div class="product-admin-card__header">
+                            <h4 class="product-admin-card__title">${product.name}</h4>
+                            ${product.isNewLaunch ? '<span class="status status--success">New Launch</span>' : ''}
+                        </div>
+                        <div class="product-admin-card__price">₹${product.price.toLocaleString()}</div>
+                        <div class="product-technologies" style="margin-top: 12px;">
+                            ${product.tags.map(tag => `<span class="tech-tag">${tag}</span>`).join('')}
+                        </div>
+                        <img src="${product.image}" alt="${product.name}" style="width: 100%; object-fit: cover; border-radius: var(--radius-sm); margin-top: 12px;" onerror="this.src='https://via.placeholder.com/250'">
                     </div>
-                    <div class="product-admin-card__header">
-                        <h4 class="product-admin-card__title">${product.name}</h4>
-                        ${product.isNewLaunch ? '<span class="status status--success">New Launch</span>' : ''}
-                    </div>
-                    <div class="product-admin-card__price">₹${product.price.toLocaleString()}</div>
-                    <div class="product-technologies" style="margin-top: 12px;">
-                        ${product.tags.map(tag => `<span class="tech-tag">${tag}</span>`).join('')}
-                    </div>
-                    <img src="${product.image}" alt="${product.name}" style="width: 100%; object-fit: cover; border-radius: var(--radius-sm); margin-top: 12px;" onerror="this.src='https://via.placeholder.com/250'">
-                </div>
-            `).join('');
+                `;
+            }).join('');
         }
 
         async function deleteProduct(productId) {
