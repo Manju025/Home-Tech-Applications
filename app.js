@@ -2,7 +2,7 @@
 let products = JSON.parse(localStorage.getItem('products')) || [
 ];
 let filteredProducts = [];
-const API_BASE_URL = 'https://home-tech-backend.onrender.com'; // Change to your deployed backend URL later
+const API_BASE_URL = 'https://home-tech-backend.onrender.com/api'; // Change to your deployed backend URL later
 
 const allTags = ["RO", "UV", "UF", "Alkaline", "Copper", "Smart", "Multi-Stage", "TDS Controller"];
 
