@@ -222,7 +222,10 @@
                         const addedProduct = await response.json(); // Get the saved product from response
                         products.push(addedProduct); // Add to local array if needed, but re-fetching is safer
                         showNotification('Product added successfully!', 'success');
-                        // ... (reset form fields) ...
+
+                        const addProcutForm = document.getElementById('addProductForm');
+                        addproductForm.reset();
+                        
                         await fetchProductsAdmin(); // Re-fetch all products to ensure UI is up-to-date
                     } catch (error) {
                         console.error("Error adding product:", error);
