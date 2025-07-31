@@ -314,12 +314,6 @@
         function renderOrdersList() {
             const container = document.getElementById('ordersList');
             
-            // Load orders from localStorage if available
-            const storedOrders = localStorage.getItem('orders');
-            if (storedOrders) {
-                orders = JSON.parse(storedOrders);
-            }
-            
             if (orders.length === 0) {
                 container.innerHTML = '<p style="text-align: center; color: var(--color-text-secondary);">No orders yet.</p>';
                 return;
@@ -486,24 +480,6 @@
 
         document.head.insertAdjacentHTML('beforeend', additionalStyles);
 
-        // Listen for storage events to sync orders
-        window.addEventListener('storage', function(e) {
-            if (e.key === 'orders') {
-                renderOrdersList();
-            }
-        });
-
-        // Periodically check for new orders
-        setInterval(function() {
-            const storedOrders = localStorage.getItem('orders');
-            if (storedOrders) {
-                const newOrders = JSON.parse(storedOrders);
-                if (newOrders.length !== orders.length) {
-                    orders = newOrders;
-                    renderOrdersList();
-                }
-            }
-        }, 2000);
     </script>
 </body>
 </html>
