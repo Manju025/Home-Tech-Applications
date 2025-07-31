@@ -211,20 +211,20 @@
                 <h3>Place Your Order</h3>
                 <form id="orderForm" class="order-form">
                     <div class="form-group">
-                        <label class="form-label">Full Name *</label>
-                        <input type="text" name="customerName" class="form-control" required>
+                        <label class="form-label" for="customerName">Full Name *</label>
+                        <input type="text" id="customerName" name="customerName" class="form-control" required>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Phone Number *</label>
-                        <input type="tel" name="customerPhone" class="form-control" required>
+                        <label class="form-label" for="customerPhone">Phone Number *</label>
+                        <input type="tel" id="customerPhone" name="customerPhone" class="form-control" required>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Address *</label>
-                        <textarea name="customerAddress" class="form-control" rows="3" required></textarea>
+                        <label class="form-label" for="customerAddress">Address *</label>
+                        <textarea name="customerAddress" id="customerAddress" class="form-control" rows="3" required></textarea>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Quantity</label>
-                        <select name="quantity" class="form-control">
+                        <label class="form-label" for="quantity">Quantity</label>
+                        <select name="quantity" id="quantity" class="form-control">
                             <option value="1">1</option>
                             <option value="2">2</option>
                             <option value="3">3</option>
@@ -233,8 +233,8 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Special Instructions</label>
-                        <textarea name="specialInstructions" class="form-control" rows="2" placeholder="Any special delivery instructions..."></textarea>
+                        <label class="form-label" for="specialInstructions">Special Instructions</label>
+                        <textarea name="specialInstructions" id="specialInstructions" class="form-control" rows="2" placeholder="Any special delivery instructions..."></textarea>
                     </div>
                     <div class="order-summary" id="orderSummary">
                         <!-- Order summary will be populated -->
