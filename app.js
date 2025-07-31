@@ -583,14 +583,15 @@ function setupFormEvents() {
     }
 }
 
-function processOrder(formData) {
+// ... (all existing code before processOrder) ...
+
+async function processOrder(formData) {
     if (!currentProduct) return;
-    
+
     const quantity = parseInt(formData.get('quantity')) || 1;
     const total = currentProduct.price * quantity;
-    
+
     const orderData = {
-        id: Date.now(),
         productId: currentProduct.id,
         productName: currentProduct.name,
         quantity: quantity,
@@ -602,25 +603,41 @@ function processOrder(formData) {
         orderDate: new Date().toLocaleDateString(),
         status: 'Pending'
     };
-    
-    orders.push(orderData);
-    
-    // Close order modal
-    closeModal('orderModal');
-    
-    // Show success notification
-    showNotification(`Order placed successfully! Order ID: #${orderData.id}`, 'success');
-    
-    // Simulate manager notification
-    setTimeout(() => {
-        alert('Manager notified');
-        showNotification('Manager has been notified of your order!', 'info');
-    }, 1500);
-    
-    // Reset form
-    const orderForm = document.getElementById('orderForm');
-    if (orderForm) orderForm.reset();
-    currentProduct = null;
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/orders`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(orderData)
+        });
+
+        if (!response.ok) throw new Error('Failed to place order');
+
+        const newOrder = await response.json();
+
+        // Close order modal
+        closeModal('orderModal');
+
+        // Show success notification
+        showNotification(`Order placed successfully! Order ID: #${newOrder.id}`, 'success');
+
+        // Simulate manager notification
+        setTimeout(() => {
+            alert('Manager notified');
+            showNotification('Manager has been notified of your order!', 'info');
+        }, 1500);
+
+        // Reset form
+        const orderForm = document.getElementById('orderForm');
+        if (orderForm) orderForm.reset();
+        currentProduct = null;
+
+        orders.push(newOrder);
+
+    } catch (error) {
+        console.error("Error placing order:", error);
+        showNotification('Failed to place order.', 'error');
+    }
 }
 
 async function placeOrder() { // Make it async
