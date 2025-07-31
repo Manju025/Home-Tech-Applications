@@ -1,6 +1,4 @@
-// Application Data - Load from localStorage or use defaults
-let products = JSON.parse(localStorage.getItem('products')) || [
-];
+let products = [];
 let filteredProducts = [];
 const API_BASE_URL = 'https://home-tech-backend.onrender.com/api'; // Change to your deployed backend URL later
 
@@ -55,14 +53,6 @@ async function fetchProductsApp() {
 }
 
 async function initializeApp() {
-    // Check for updated products from localStorage
-    const storedProducts = localStorage.getItem('products');
-    if (storedProducts) {
-        products = JSON.parse(storedProducts);
-    } else {
-        // Save initial products to localStorage
-        localStorage.setItem('products', JSON.stringify(products));
-    }
     await fetchProductsApp();
     renderNewLaunches();
     renderProducts();
@@ -196,11 +186,10 @@ function setupAdminEventListeners() {
     }
 }
 
-function addNewProduct(formData) {
+async function addNewProduct(formData) {
     const selectedTechnologies = [];
-    document.querySelectorAll('#technologyCheckboxes input[type="checkbox"]:checked').forEach(checkbox => {
-        selectedTechnologies.push(checkbox.value);
-    });
+    document.querySelectorAll('#technologyCheckboxes input[type="checkbox"]:checked')
+        .forEach(checkbox => selectedTechnologies.push(checkbox.value));
 
     if (selectedTechnologies.length === 0) {
         alert('Please select at least one technology.');
@@ -211,35 +200,43 @@ function addNewProduct(formData) {
         id: Date.now(),
         name: formData.get('productName'),
         price: parseInt(formData.get('productPrice')),
-        image: uploadedImageDataURL, // Use the base64 image
+        image: uploadedImageDataURL,
         tags: selectedTechnologies,
         isNewLaunch: formData.get('isNewLaunch') === 'on'
     };
 
-    products.push(newProduct);
-    localStorage.setItem('products', JSON.stringify(products));
+    try {
+        const response = await fetch(`${API_BASE_URL}/products`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(newProduct)
+        });
 
-    // Show success notification
-    showNotification('Product added successfully!', 'success');
+        if (!response.ok) throw new Error('Failed to add product');
 
-    // Reset form
-    document.getElementById('addProductForm').reset();
-    document.querySelectorAll('#technologyCheckboxes input[type="checkbox"]').forEach(checkbox => {
-        checkbox.checked = false;
-    });
+        showNotification('Product added successfully!', 'success');
+        document.getElementById('addProductForm').reset();
+        document.querySelectorAll('#technologyCheckboxes input[type="checkbox"]').forEach(cb => cb.checked = false);
 
-    uploadedImageDataURL = null;
-    const previewBox = document.getElementById('imagePreview');
-    if (previewBox) previewBox.style.display = 'none';
-    const hint = document.getElementById('imageHint');
-    if (hint) {
-        hint.textContent = '';
-        hint.style.color = 'var(--color-text-secondary)';
+        uploadedImageDataURL = null;
+        const previewBox = document.getElementById('imagePreview');
+        if (previewBox) previewBox.style.display = 'none';
+        const hint = document.getElementById('imageHint');
+        if (hint) {
+            hint.textContent = '';
+            hint.style.color = 'var(--color-text-secondary)';
+        }
+
+        // Reload products from backend
+        await fetchProductsApp();
+        renderProductsAdmin();
+
+    } catch (error) {
+        console.error('Error adding product:', error);
+        showNotification('Failed to add product.', 'error');
     }
-
-    // Refresh products display
-    renderProductsAdmin();
 }
+
 
 function renderProductsAdmin() {
     const container = document.getElementById('productsAdminGrid');
@@ -268,17 +265,28 @@ function renderProductsAdmin() {
     `).join('');
 }
 
-function deleteProduct(productId) {
-    if (!confirm('Are you sure you want to delete this product?')) {
-        return;
-    }
+async function deleteProduct(productId) {
+    if (!confirm('Are you sure you want to delete this product?')) return;
 
-    products = products.filter(product => product.id !== productId);
-    localStorage.setItem('products', JSON.stringify(products));
-    
-    showNotification('Product deleted successfully!', 'success');
-    renderProductsAdmin();
+    try {
+        const response = await fetch(`${API_BASE_URL}/products/${productId}`, {
+            method: 'DELETE',
+        });
+
+        if (!response.ok) throw new Error('Failed to delete product');
+
+        showNotification('Product deleted successfully!', 'success');
+
+        // Refetch products from backend
+        await fetchProductsApp();
+        renderProductsAdmin();
+
+    } catch (error) {
+        console.error('Error deleting product:', error);
+        showNotification('Failed to delete product.', 'error');
+    }
 }
+
 
 function renderOrdersList() {
     const container = document.getElementById('ordersList');
@@ -645,7 +653,7 @@ async function placeOrder() { // Make it async
         showNotification('Order placed successfully! We will contact you soon.', 'success');
         hideModal('orderModal');
         document.getElementById('orderForm').reset();
-        // No need to save to localStorage here
+        
         // Admin panel will pick up the new order via its fetchOrdersAdmin or periodic refresh
     } catch (error) {
         console.error("Error placing order:", error);
