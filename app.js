@@ -1,4 +1,3 @@
-
 let products = [];
 let filteredProducts = [];
 const API_BASE_URL = 'https://home-tech-backend.onrender.com/api';
@@ -40,7 +39,7 @@ async function fetchProductsApp() {
         const response = await fetch(`${API_BASE_URL}/products`);
         if (!response.ok) throw new Error('Failed to fetch products');
         products = await response.json();
-        
+       
         applyFilters();
         renderNewLaunches();
         renderProducts();
@@ -86,17 +85,17 @@ async function initializeAdmin() {
 
     isAdminMode = true;
     document.body.classList.add('admin-mode');
-    
+   
     // Hide regular content and show admin panel
     const mainElement = document.querySelector('.main');
     const footerElement = document.querySelector('.footer');
-    if (mainElement) mainElement.style.display = 'none';
-    if (footerElement) footerElement.style.display = 'none';
+    if (mainElement) mainElement.classList.add('hidden');
+    if (footerElement) footerElement.classList.add('hidden');
 
     // Fetch data for admin
     await fetchProductsApp();
     await fetchOrders();
-    
+   
     // Create admin interface
     createAdminInterface();
     setupAdminEventListeners();
@@ -140,19 +139,19 @@ function setupAdminEventListeners() {
     // Admin tabs
     const tabs = document.querySelectorAll('.admin-tab');
     const contents = document.querySelectorAll('.admin-tab-content');
-    
+   
     tabs.forEach(tab => {
         tab.addEventListener('click', function() {
             const targetTab = this.dataset.tab;
-            
+           
             // Remove active class from all tabs and contents
             tabs.forEach(t => t.classList.remove('active'));
             contents.forEach(c => c.classList.remove('active'));
-            
+           
             // Add active class to clicked tab and corresponding content
             this.classList.add('active');
             document.getElementById(targetTab).classList.add('active');
-            
+           
             // Refresh data when switching tabs
             if (targetTab === 'manage-products') {
                 renderProductsAdmin();
@@ -193,46 +192,47 @@ function setupImageUpload() {
         const file = e.target.files[0];
         if (!file) {
             uploadedImageDataURL = null;
-            previewBox.style.display = 'none';
+            previewBox.classList.add('hidden');
             return;
         }
 
         // Validation
         if (!/^image\/(png|jpe?g)$/i.test(file.type)) {
             hint.textContent = 'Only PNG or JPG files allowed';
-            hint.style.color = 'var(--color-error)';
+            hint.classList.add('error');
             fileInput.value = '';
             uploadedImageDataURL = null;
-            previewBox.style.display = 'none';
+            previewBox.classList.add('hidden');
             return;
         }
 
         if (file.size > 5 * 1024 * 1024) {
             hint.textContent = 'Image too large (max 5 MB)';
-            hint.style.color = 'var(--color-error)';
+            hint.classList.add('error');
             fileInput.value = '';
             uploadedImageDataURL = null;
-            previewBox.style.display = 'none';
+            previewBox.classList.add('hidden');
             return;
         }
 
         hint.textContent = 'Reading image...';
-        hint.style.color = 'var(--color-text-secondary)';
+        hint.classList.remove('error', 'success');
 
         // Read file as base64
         const reader = new FileReader();
         reader.onload = function(evt) {
             uploadedImageDataURL = evt.target.result;
             previewImg.src = uploadedImageDataURL;
-            previewBox.style.display = 'block';
+            previewBox.classList.remove('hidden');
             hint.textContent = '✓ Image ready';
-            hint.style.color = 'var(--color-success)';
+            hint.classList.remove('error');
+            hint.classList.add('success');
         };
         reader.onerror = function() {
             hint.textContent = 'Error reading file';
-            hint.style.color = 'var(--color-error)';
+            hint.classList.add('error');
             uploadedImageDataURL = null;
-            previewBox.style.display = 'none';
+            previewBox.classList.add('hidden');
         };
         reader.readAsDataURL(file);
     });
@@ -268,19 +268,19 @@ async function addNewProduct(formData) {
         if (!response.ok) throw new Error('Failed to add product');
 
         showNotification('Product added successfully!', 'success');
-        
+       
         // Reset form
         document.getElementById('addProductForm').reset();
         document.querySelectorAll('#technologyCheckboxes input[type="checkbox"]').forEach(cb => cb.checked = false);
         uploadedImageDataURL = null;
-        
+       
         const previewBox = document.getElementById('imagePreview');
-        if (previewBox) previewBox.style.display = 'none';
-        
+        if (previewBox) previewBox.classList.add('hidden');
+       
         const hint = document.getElementById('imageHint');
         if (hint) {
             hint.textContent = '';
-            hint.style.color = 'var(--color-text-secondary)';
+            hint.classList.remove('error', 'success');
         }
 
         // Reload products from backend
@@ -315,7 +315,7 @@ async function deleteProduct(productId) {
 // Submit order
 async function submitOrder(form) {
     const formData = new FormData(form);
-    
+   
     const orderData = {
         id: Date.now().toString(),
         productId: currentProduct.id,
@@ -379,15 +379,14 @@ function createAdminInterface() {
                     🚪 Exit Admin
                 </button>
             </div>
-            
+           
             <div class="admin-tabs">
                 <button class="admin-tab active" data-tab="add-product">➕ Add Product</button>
                 <button class="admin-tab" data-tab="manage-products">📦 Manage Products</button>
                 <button class="admin-tab" data-tab="orders">🛍️ View Orders</button>
             </div>
-            
+           
             <div class="admin-content">
-                <!-- Add Product Tab -->
                 <div id="add-product" class="admin-tab-content active">
                     <h2>Add New Product</h2>
                     <form id="addProductForm" class="admin-form">
@@ -395,21 +394,21 @@ function createAdminInterface() {
                             <label for="productName">Product Name:</label>
                             <input type="text" id="productName" name="productName" required>
                         </div>
-                        
+                       
                         <div class="form-group">
                             <label for="productPrice">Price (₹):</label>
                             <input type="number" id="productPrice" name="productPrice" required min="1">
                         </div>
-                        
+                       
                         <div class="form-group">
                             <label for="productImageFile">Product Image:</label>
                             <input type="file" id="productImageFile" accept="image/png,image/jpeg,image/jpg">
-                            <small id="imageHint" style="color: var(--color-text-secondary);"></small>
-                            <div id="imagePreview" style="display: none; margin-top: 10px;">
-                                <img id="previewImg" style="max-width: 200px; max-height: 200px; border-radius: 8px;">
+                            <small id="imageHint"></small>
+                            <div id="imagePreview" class="hidden">
+                                <img id="previewImg">
                             </div>
                         </div>
-                        
+                       
                         <div class="form-group">
                             <label>Technologies:</label>
                             <div id="technologyCheckboxes" class="checkbox-group">
@@ -421,32 +420,30 @@ function createAdminInterface() {
                                 `).join('')}
                             </div>
                         </div>
-                        
+                       
                         <div class="form-group">
                             <label class="checkbox-label">
                                 <input type="checkbox" name="isNewLaunch">
                                 <span>Mark as New Launch</span>
                             </label>
                         </div>
-                        
+                       
                         <button type="submit" class="btn-primary">Add Product</button>
                     </form>
                 </div>
-                
-                <!-- Manage Products Tab -->
+               
                 <div id="manage-products" class="admin-tab-content">
                     <h2>Manage Products</h2>
                     <div id="productsAdminGrid" class="admin-products-grid"></div>
                 </div>
-                
-                <!-- Orders Tab -->
+               
                 <div id="orders" class="admin-tab-content">
                     <h2>Customer Orders</h2>
                     <div id="ordersContainer" class="orders-container"></div>
                 </div>
             </div>
         </div>
-        
+       
         <div id="notification" class="notification"></div>
     `;
 }
@@ -516,26 +513,26 @@ function renderOrdersList() {
 // Render new launches
 function renderNewLaunches() {
     if (!newLaunchesGrid) return;
-    
+   
     const newProducts = products.filter(product => product.isNewLaunch);
-    
+   
     if (newProducts.length === 0) {
         newLaunchesGrid.innerHTML = '<p>No new launches at the moment.</p>';
         return;
     }
-    
+   
     newLaunchesGrid.innerHTML = newProducts.map(product => createProductCard(product)).join('');
 }
 
 // Render all products
 function renderProducts(filteredProducts = products) {
     if (!productsGrid) return;
-    
+   
     if (filteredProducts.length === 0) {
         productsGrid.innerHTML = '<p>No products match your filters.</p>';
         return;
     }
-    
+   
     productsGrid.innerHTML = filteredProducts.map(product => createProductCard(product)).join('');
 }
 
@@ -561,9 +558,9 @@ function createProductCard(product) {
 // Render filter tags
 function renderFilterTags() {
     if (!filterTags) return;
-    
+   
     filterTags.innerHTML = allTags.map(tag => `
-        <button class="filter-tag ${activeFilters.includes(tag) ? 'active' : ''}" 
+        <button class="filter-tag ${activeFilters.includes(tag) ? 'active' : ''}"
                 onclick="toggleFilter('${tag}')">
             ${tag}
         </button>
@@ -585,7 +582,7 @@ function applyFilters() {
     if (activeFilters.length === 0) {
         filteredProducts = products;
     } else {
-        filteredProducts = products.filter(product => 
+        filteredProducts = products.filter(product =>
             activeFilters.some(filter => product.tags.includes(filter))
         );
     }
@@ -602,41 +599,41 @@ function clearFilters() {
 function openProductModal(productId) {
     currentProduct = products.find(p => p.id === productId);
     if (!currentProduct || !productModal) return;
-    
+   
     document.getElementById('modalProductImage').src = currentProduct.image || '/api/placeholder/400/300';
     document.getElementById('modalProductName').textContent = currentProduct.name;
     document.getElementById('modalProductPrice').textContent = `₹${currentProduct.price}`;
-    document.getElementById('modalProductTags').innerHTML = 
+    document.getElementById('modalProductTags').innerHTML =
         currentProduct.tags.map(tag => `<span class="tag">${tag}</span>`).join('');
-    
-    productModal.style.display = 'block';
+   
+    productModal.classList.remove('hidden');
 }
 
 function closeProductModal() {
     if (productModal) {
-        productModal.style.display = 'none';
+        productModal.classList.add('hidden');
     }
 }
 
 function openOrderModal() {
     if (!orderModal) return;
     closeProductModal();
-    orderModal.style.display = 'block';
+    orderModal.classList.remove('hidden');
 }
 
 function closeOrderModal() {
     if (orderModal) {
-        orderModal.style.display = 'none';
+        orderModal.classList.add('hidden');
     }
 }
 
 // Utility functions
 function showNotification(message, type = 'success') {
     if (!notification) return;
-    
+   
     notification.textContent = message;
     notification.className = `notification ${type} show`;
-    
+   
     setTimeout(() => {
         notification.classList.remove('show');
     }, 3000);
