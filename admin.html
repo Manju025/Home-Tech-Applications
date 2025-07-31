@@ -306,7 +306,8 @@
         }
 
         async function deleteProduct(productId) {
-            if (!productId) {
+    // Add this check to prevent API calls with undefined or invalid IDs
+            if (!productId || isNaN(productId)) {
                 console.error("Error: Attempted to delete a product with an invalid ID.");
                 showNotification('Error: Invalid product ID.', 'error');
                 return;
