@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Home Tech Applications</title>
+    <link rel="icon" href="icon.png" type="image/jpeg">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="admin-container">
+        <div class="admin-header">
+            <h1>Admin Panel - Home Tech Applications</h1>
+            <p>Manage Products and Orders</p>
+        </div>
+
+        <div class="admin-panel">
+            <div class="admin-tabs">
+                <button class="admin-tab active" data-tab="add-product">Add Product</button>
+                <button class="admin-tab" data-tab="manage-products">Manage Products</button>
+                <button class="admin-tab" data-tab="orders">View Orders</button>
+            </div>
+            
+            <div class="admin-content">
+                <!-- Add Product Tab -->
+                <div class="admin-tab-content active" id="add-product">
+                    <h3>Add New Product</h3>
+                    <form id="addProductForm" class="add-product-form">
+                        <div class="form-group">
+                            <label class="form-label">Product Name *</label>
+                            <input type="text" name="productName" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Price (INR) *</label>
+                            <input type="number" name="productPrice" class="form-control" required min="1">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Upload image (PNG/JPG &lt; 5 MB)</label>
+                            <input type="file"
+                                id="productImageFile"
+                                class="form-control"
+                                accept="image/png, image/jpeg" />
+                            <small id="imageHint" class="text-muted"></small>
+                        </div>
+                        <div id="imagePreview" style="margin-top:12px;display:none">
+                            <img id="previewImg" style="max-width:180px;border-radius:6px" />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Technologies (select multiple) *</label>
+                            <div class="checkbox-group" id="technologyCheckboxes">
+                                <!-- Technology checkboxes will be populated -->
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="isNewLaunch"> Mark as New Launch
+                            </label>
+                        </div>
+                        <button type="submit" class="btn btn--primary">Add Product</button>
+                    </form>
+                </div>
+                
+                <!-- Manage Products Tab -->
+                <div class="admin-tab-content" id="manage-products">
+                    <h3>Manage Products</h3>
+                    <div class="products-admin-grid" id="productsAdminGrid">
+                        <!-- Products will be populated -->
+                    </div>
+                </div>
+                
+                <!-- Orders Tab -->
+                <div class="admin-tab-content" id="orders">
+                    <h3>Customer Orders</h3>
+                    <div class="orders-list" id="ordersList">
+                        <!-- Orders will be populated -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification -->
+    <div class="notification hidden" id="notification">
+        <div class="notification__content">
+            <span class="notification__message" id="notificationMessage"></span>
+            <button class="notification__close" id="notificationClose">&times;</button>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:5000/api'; // Change to your deployed backend URL later
+        const PLACEHOLDER = 'https://placehold.co/250x250?text=No+Image';
+        // Admin Authentication
+        document.addEventListener('DOMContentLoaded', function() {
+            authenticateAdmin();
+        });
+
+        function authenticateAdmin() {
+            const password = prompt('Enter admin password:');
+            if (password !== 'manager123') {
+                alert('Incorrect password. Redirecting to home page.');
+                window.location.href = 'index.html';
+                return;
+            }
+            initializeAdmin();
+        }
+
+        // Admin Application Data
+        let products = JSON.parse(localStorage.getItem('products')) || [
+        ];
+
+        const availableTags = ["RO", "UV", "UF", "Alkaline", "Copper", "Smart", "Multi-Stage", "TDS Controller"];
+        let orders = [];
+
+        async function initializeAdmin() {
+            await fetchProductsAdmin();
+            await fetchOrdersAdmin();
+            setupAdminEventListeners();
+            renderTechnologyCheckboxes();
+            renderProductsAdmin();
+            renderOrdersList();
+            
+            // Save initial products to localStorage if not exists
+            //if (!localStorage.getItem('products')) {
+            //    localStorage.setItem('products', JSON.stringify(products));
+            //}
+        }
+        async function fetchProductsAdmin() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/products`);
+                if (!response.ok) throw new Error('Failed to fetch products');
+                products = await response.json();
+                renderProductsAdmin();
+            } catch (error) {
+                console.error("Error fetching products:", error);
+                showNotification('Failed to load products. ' + error.message, 'error');
+            }
+        }
+
+        async function fetchOrdersAdmin() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/orders`);
+                if (!response.ok) throw new Error('Failed to fetch orders');
+                orders = await response.json();
+                renderOrdersList();
+            } catch (error) {
+                console.error("Error fetching orders:", error);
+                showNotification('Failed to load orders. ' + error.message, 'error');
+            }
+        }
+
+
+        function setupAdminEventListeners() {
+            // Admin tabs
+            const tabs = document.querySelectorAll('.admin-tab');
+            const contents = document.querySelectorAll('.admin-tab-content');
+            
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const targetTab = this.dataset.tab;
+                    
+                    // Remove active class from all tabs and contents
+                    tabs.forEach(t => t.classList.remove('active'));
+                    contents.forEach(c => c.classList.remove('active'));
+                    
+                    // Add active class to clicked tab and corresponding content
+                    this.classList.add('active');
+                    document.getElementById(targetTab).classList.add('active');
+                    
+                    // Refresh data when switching tabs
+                    if (targetTab === 'manage-products') {
+                        renderProductsAdmin();
+                    } else if (targetTab === 'orders') {
+                        renderOrdersList();
+                    }
+                });
+            });
+
+            // Add product form
+            document.getElementById('addProductForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                addNewProduct(new FormData(this));
+            });
+
+            // Notification close
+            document.getElementById('notificationClose').addEventListener('click', hideNotification);
+        }
+
+        function renderTechnologyCheckboxes() {
+            const container = document.getElementById('technologyCheckboxes');
+            container.innerHTML = availableTags.map(tag => `
+                <label class="checkbox-label">
+                    <input type="checkbox" value="${tag}"> ${tag}
+                </label>
+            `).join('');
+        }
+
+        async function addNewProduct(formData) { // Make it async
+            const selectedTechnologies = [];
+            // ... (existing technology selection and validation) ...
+
+            const productImageInput = document.getElementById('productImageFile');
+            const imageFile = productImageInput.files[0];
+            let imageUrl = PLACEHOLDER;
+
+            if (imageFile) {
+                // ... (existing FileReader logic) ...
+                const reader = new FileReader();
+                reader.onload = async function(e) { // Make inner function async too
+                    imageUrl = e.target.result;
+
+                    const newProduct = {
+                        id: Date.now(),
+                        name: formData.get('productName'),
+                        price: parseInt(formData.get('productPrice')),
+                        image: imageUrl,
+                        tags: selectedTechnologies,
+                        isNewLaunch: formData.get('isNewLaunch') === 'on'
+                    };
+
+                    try {
+                        const response = await fetch(`${API_BASE_URL}/products`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(newProduct)
+                        });
+                        if (!response.ok) throw new Error('Failed to add product');
+                        const addedProduct = await response.json(); // Get the saved product from response
+                        products.push(addedProduct); // Add to local array if needed, but re-fetching is safer
+                        showNotification('Product added successfully!', 'success');
+                        // ... (reset form fields) ...
+                        await fetchProductsAdmin(); // Re-fetch all products to ensure UI is up-to-date
+                    } catch (error) {
+                        console.error("Error adding product:", error);
+                        showNotification('Error adding product: ' + error.message, 'error');
+                    }
+                };
+                reader.readAsDataURL(imageFile);
+            } else {
+                // ... (existing logic for placeholder image) ...
+                const newProduct = {
+                    id: Date.now(),
+                    name: formData.get('productName'),
+                    price: parseInt(formData.get('productPrice')),
+                    image: imageUrl,
+                    tags: selectedTechnologies,
+                    isNewLaunch: formData.get('isNewLaunch') === 'on'
+                };
+
+                try {
+                    const response = await fetch(`${API_BASE_URL}/products`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(newProduct)
+                    });
+                    if (!response.ok) throw new Error('Failed to add product');
+                    const addedProduct = await response.json();
+                    products.push(addedProduct);
+                    showNotification('Product added successfully!', 'success');
+                    // ... (reset form fields) ...
+                    await fetchProductsAdmin(); // Re-fetch
+                } catch (error) {
+                    console.error("Error adding product:", error);
+                    showNotification('Error adding product: ' + error.message, 'error');
+                }
+            }
+        }
+
+        function renderProductsAdmin() {
+            const container = document.getElementById('productsAdminGrid');
+            
+            if (products.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: var(--color-text-secondary);">No products available.</p>';
+                return;
+            }
+
+            container.innerHTML = products.map(product => `
+                <div class="product-admin-card">
+                    <div class="product-admin-card__actions">
+                        <button class="btn-delete" onclick="deleteProduct(${product.id})">Delete</button>
+                    </div>
+                    <div class="product-admin-card__header">
+                        <h4 class="product-admin-card__title">${product.name}</h4>
+                        ${product.isNewLaunch ? '<span class="status status--success">New Launch</span>' : ''}
+                    </div>
+                    <div class="product-admin-card__price">₹${product.price.toLocaleString()}</div>
+                    <div class="product-technologies" style="margin-top: 12px;">
+                        ${product.tags.map(tag => `<span class="tech-tag">${tag}</span>`).join('')}
+                    </div>
+                    <img src="${product.image}" alt="${product.name}" style="width: 100%; object-fit: cover; border-radius: var(--radius-sm); margin-top: 12px;" onerror="this.src='https://via.placeholder.com/250'">
+                </div>
+            `).join('');
+        }
+
+        async function deleteProduct(productId) { // Make it async
+            if (!confirm('Are you sure you want to delete this product?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/products/${productId}`, {
+                    method: 'DELETE'
+                });
+                if (!response.ok) throw new Error('Failed to delete product');
+
+                showNotification('Product deleted successfully!', 'success');
+                await fetchProductsAdmin(); // Re-fetch to update UI
+            } catch (error) {
+                console.error("Error deleting product:", error);
+                showNotification('Error deleting product: ' + error.message, 'error');
+            }
+        }
+
+        function renderOrdersList() {
+            const container = document.getElementById('ordersList');
+            
+            // Load orders from localStorage if available
+            const storedOrders = localStorage.getItem('orders');
+            if (storedOrders) {
+                orders = JSON.parse(storedOrders);
+            }
+            
+            if (orders.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: var(--color-text-secondary);">No orders yet.</p>';
+                return;
+            }
+
+            container.innerHTML = orders.map(order => `
+                <div class="order-item-admin">
+                    <div class="order-header">
+                        <span class="order-id">Order #${order.id}</span>
+                        <div>
+                            <span class="order-status order-status--${order.status.toLowerCase()}">${order.status}</span>
+                            ${order.status === 'Pending' ? 
+                                `<button class="btn btn--sm btn--secondary" onclick="markOrderAsDone('${order.id}')">Mark as Done</button>` : ''
+                            }
+                        </div>
+                    </div>
+                    <div class="order-details">
+                        <div><strong>Product:</strong> ${order.productName}</div>
+                        <div><strong>Quantity:</strong> ${order.quantity}</div>
+                        <div><strong>Customer:</strong> ${order.customerName}</div>
+                        <div><strong>Phone:</strong> ${order.customerPhone}</div>
+                        <div><strong>Date:</strong> ${order.orderDate}</div>
+                        <div><strong>Total:</strong> ₹${order.total.toLocaleString()}</div>
+                    </div>
+                    <div style="margin-top: 12px;">
+                        <strong>Address:</strong> ${order.customerAddress}
+                    </div>
+                    ${order.specialInstructions ? 
+                        `<div style="margin-top: 8px;"><strong>Instructions:</strong> ${order.specialInstructions}</div>` : ''
+                    }
+                </div>
+            `).join('');
+        }
+
+        async function markOrderAsDone(orderId) { // Make it async
+            if (!confirm('Are you sure you want to mark this order as Done?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/orders/${orderId}/status`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status: 'Done' })
+                });
+                if (!response.ok) throw new Error('Failed to update order status');
+
+                showNotification(`Order #${orderId} marked as Done!`, 'success');
+                await fetchOrdersAdmin(); // Re-fetch to update UI
+            } catch (error) {
+                console.error("Error marking order as done:", error);
+                showNotification('Error updating order status: ' + error.message, 'error');
+            }
+        }
+
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            const notificationMessage = document.getElementById('notificationMessage');
+            notificationMessage.textContent = message;
+            
+            // Update notification style based on type
+            notification.className = `notification ${type === 'success' ? '' : 'notification--' + type}`;
+            notification.classList.remove('hidden');
+            
+            // Auto-hide after 5 seconds
+            setTimeout(hideNotification, 5000);
+        }
+
+        function hideNotification() {
+            document.getElementById('notification').classList.add('hidden');
+        }
+
+        // Order Item Admin Styles
+        const additionalStyles = `
+            <style>
+            .order-item-admin {
+                background-color: var(--color-bg-1);
+                padding: var(--space-16);
+                border-radius: var(--radius-md);
+                border: 1px solid var(--color-card-border);
+                margin-bottom: var(--space-16);
+            }
+
+            .order-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: var(--space-12);
+            }
+
+            .order-id {
+                font-weight: var(--font-weight-bold);
+                color: var(--color-primary);
+            }
+
+            .order-status {
+                padding: var(--space-4) var(--space-8);
+                border-radius: var(--radius-sm);
+                font-size: var(--font-size-xs);
+                font-weight: var(--font-weight-medium);
+            }
+
+            .order-status--pending {
+                background-color: var(--color-bg-2);
+                color: var(--color-warning);
+                border: 1px solid rgba(var(--color-warning-rgb), 0.3);
+            }
+
+            .order-status--done {
+                background-color: var(--color-success);
+                color: var(--color-white);
+                border: 1px solid rgba(var(--color-success-rgb), 0.3);
+            }
+
+            .order-details {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: var(--space-12);
+                font-size: var(--font-size-sm);
+                color: var(--color-text-secondary);
+            }
+
+            .add-product-form {
+                display: flex;
+                flex-direction: column;
+                gap: var(--space-16);
+                max-width: 600px;
+            }
+
+            .checkbox-group {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+                gap: var(--space-8);
+            }
+
+            .checkbox-label {
+                display: flex;
+                align-items: center;
+                gap: var(--space-8);
+                font-weight: var(--font-weight-normal);
+                cursor: pointer;
+            }
+
+            @media (max-width: 768px) {
+                .order-details {
+                    grid-template-columns: 1fr;
+                }
+                
+                .admin-tabs {
+                    flex-direction: column;
+                }
+                
+                .admin-tab {
+                    text-align: left;
+                    border-bottom: 1px solid var(--color-border);
+                }
+                
+                .products-admin-grid {
+                    grid-template-columns: 1fr;
+                }
+            }
+            </style>
+        `;
+
+        document.head.insertAdjacentHTML('beforeend', additionalStyles);
+
+        // Listen for storage events to sync orders
+        window.addEventListener('storage', function(e) {
+            if (e.key === 'orders') {
+                renderOrdersList();
+            }
+        });
+
+        // Periodically check for new orders
+        setInterval(function() {
+            const storedOrders = localStorage.getItem('orders');
+            if (storedOrders) {
+                const newOrders = JSON.parse(storedOrders);
+                if (newOrders.length !== orders.length) {
+                    orders = newOrders;
+                    renderOrdersList();
+                }
+            }
+        }, 2000);
+    </script>
+</body>
+</html>
