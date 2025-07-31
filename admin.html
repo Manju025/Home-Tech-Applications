@@ -294,17 +294,23 @@
             `).join('');
         }
 
-        async function deleteProduct(productId) { // Make it async
+        async function deleteProduct(productId) {
+            if (!productId) {
+                console.error("Error: Attempted to delete a product with an invalid ID.");
+                showNotification('Error: Invalid product ID.', 'error');
+                return;
+            }
+        
             if (!confirm('Are you sure you want to delete this product?')) {
                 return;
             }
-
+        
             try {
                 const response = await fetch(`${API_BASE_URL}/products/${productId}`, {
                     method: 'DELETE'
                 });
                 if (!response.ok) throw new Error('Failed to delete product');
-
+        
                 showNotification('Product deleted successfully!', 'success');
                 await fetchProductsAdmin(); // Re-fetch to update UI
             } catch (error) {
