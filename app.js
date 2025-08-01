@@ -569,7 +569,7 @@ async function processOrder(formData) {
 
     const quantity = parseInt(formData.get('quantity')) || 1;
     const total = currentProduct.price * quantity;
-
+    
     const orderData = {
         productId: currentProduct.id,
         productName: currentProduct.name,
@@ -598,7 +598,7 @@ async function processOrder(formData) {
         closeModal('orderModal');
 
         // Show success notification
-        const orderId = newOrder.id || 'N/A';
+        const orderId = newOrder.id';
         showNotification(`Order placed successfully! Order ID: #${orderId}`, 'success');
 
 
