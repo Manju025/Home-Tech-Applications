@@ -938,8 +938,8 @@ select.form-control {
 }
 
 .product-card__image {
-  height: 260px;
-  padding-left:35px
+  width:100%;
+  padding-left:35px;
   object-fit: cover;
 }
 
