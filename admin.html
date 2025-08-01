@@ -239,6 +239,7 @@
                 imageUrl = await processImage;
         
                 const newProduct = {
+                    id: Date.now()
                     name: newProductName,
                     price: parseInt(formData.get('productPrice')),
                     image: imageUrl,
