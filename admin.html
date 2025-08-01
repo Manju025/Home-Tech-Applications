@@ -340,42 +340,45 @@
 
         function renderOrdersList() {
             const container = document.getElementById('ordersList');
-            const orderId = order.id || order._id || 'N/A';
             
             if (orders.length === 0) {
                 container.innerHTML = '<p style="text-align: center; color: var(--color-text-secondary);">No orders yet.</p>';
                 return;
             }
-    
-            container.innerHTML = orders.map(order => `
-                <div class="order-item-admin">
-                    <div class="order-header">
-                        <span class="order-id">Order #${orderId}</span>
-                        <div>
-                            <span class="order-status order-status--${(order.status || 'unknown').toLowerCase()}">${order.status}</span>
-                            ${order.status.trim().toLowerCase() === 'pending' ? 
-                               `<button class="btn btn--sm btn--secondary" onclick="markOrderAsDone('${order.id}')">Mark as Done</button>` : ''
-                            }
-
+        
+            container.innerHTML = orders.map(order => {
+                const orderId = order.id || order._id || 'N/A'; // 🛠️ Now inside the loop!
+        
+                return `
+                    <div class="order-item-admin">
+                        <div class="order-header">
+                            <span class="order-id">Order #${orderId}</span>
+                            <div>
+                                <span class="order-status order-status--${order.status.toLowerCase()}">${order.status}</span>
+                                ${order.status.trim().toLowerCase() === 'pending' ? 
+                                    `<button class="btn btn--sm btn--secondary" onclick="markOrderAsDone('${orderId}')">Mark as Done</button>` : ''
+                                }
+                            </div>
                         </div>
+                        <div class="order-details">
+                            <div><strong>Product:</strong> ${order.productName}</div>
+                            <div><strong>Quantity:</strong> ${order.quantity}</div>
+                            <div><strong>Customer:</strong> ${order.customerName}</div>
+                            <div><strong>Phone:</strong> ${order.customerPhone}</div>
+                            <div><strong>Date:</strong> ${order.orderDate}</div>
+                            <div><strong>Total:</strong> ₹${order.total.toLocaleString()}</div>
+                        </div>
+                        <div style="margin-top: 12px;">
+                            <strong>Address:</strong> ${order.customerAddress}
+                        </div>
+                        ${order.specialInstructions ? 
+                            `<div style="margin-top: 8px;"><strong>Instructions:</strong> ${order.specialInstructions}</div>` : ''
+                        }
                     </div>
-                    <div class="order-details">
-                        <div><strong>Product:</strong> ${order.productName}</div>
-                        <div><strong>Quantity:</strong> ${order.quantity}</div>
-                        <div><strong>Customer:</strong> ${order.customerName}</div>
-                        <div><strong>Phone:</strong> ${order.customerPhone}</div>
-                        <div><strong>Date:</strong> ${order.orderDate}</div>
-                        <div><strong>Total:</strong> ₹${order.total.toLocaleString()}</div>
-                    </div>
-                    <div style="margin-top: 12px;">
-                        <strong>Address:</strong> ${order.customerAddress}
-                    </div>
-                    ${order.specialInstructions ? 
-                        `<div style="margin-top: 8px;"><strong>Instructions:</strong> ${order.specialInstructions}</div>` : ''
-                    }
-                </div>
-            `).join('');
+                `;
+            }).join('');
         }
+
         async function markOrderAsDone(orderId) {
             if (!orderId || orderId === 'N/A') {
                 showNotification('Order ID missing. Cannot update.', 'error');
