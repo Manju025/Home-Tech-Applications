@@ -345,18 +345,22 @@
 
         function renderOrdersList() {
             const container = document.getElementById('ordersList');
-            if (!container) return;
             
-            if (!orders || orders.length === 0) {
+            if (orders.length === 0) {
                 container.innerHTML = '<p style="text-align: center; color: var(--color-text-secondary);">No orders yet.</p>';
                 return;
             }
-        
+
             container.innerHTML = orders.map(order => `
                 <div class="order-item-admin">
                     <div class="order-header">
                         <span class="order-id">Order #${order.id}</span>
-                        <span class="order-status order-status--${order.status.toLowerCase()}">${order.status}</span>
+                        <div>
+                            <span class="order-status order-status--${order.status.toLowerCase()}">${order.status}</span>
+                            ${order.status === 'Pending' ? 
+                                `<button class="btn btn--sm btn--secondary" onclick="markOrderAsDone('${order.id}')">Mark as Done</button>` : ''
+                            }
+                        </div>
                     </div>
                     <div class="order-details">
                         <div><strong>Product:</strong> ${order.productName}</div>
