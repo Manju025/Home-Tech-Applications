@@ -347,7 +347,7 @@
             }
         
             container.innerHTML = orders.map(order => {
-                const orderId = order.id || 'N/A'; // 🛠️ Now inside the loop!
+                const orderId = order.id; // 🛠️ Now inside the loop!
         
                 return `
                     <div class="order-item-admin">
