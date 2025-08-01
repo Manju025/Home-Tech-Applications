@@ -598,7 +598,9 @@ async function processOrder(formData) {
         closeModal('orderModal');
 
         // Show success notification
-        showNotification(`Order placed successfully! Order ID: #${newOrder.id}`, 'success');
+        const orderId = newOrder.id || newOrder._id || 'N/A';
+        showNotification(`Order placed successfully! Order ID: #${orderId}`, 'success');
+
 
         // Simulate manager notification
         setTimeout(() => {
