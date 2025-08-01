@@ -352,9 +352,10 @@
                         <span class="order-id">Order #${order.id}</span>
                         <div>
                             <span class="order-status order-status--${(order.status || 'unknown').toLowerCase()}">${order.status}</span>
-                            ${(order.status || '').trim().toLowerCase() === 'pending' && order.id ? 
-                                `<button class="btn btn--sm btn--secondary" onclick="markOrderAsDone('${order.id}')">Mark as Done</button>` : ''
+                            ${order.status.trim().toLowerCase() === 'pending' ? 
+                               `<button class="btn btn--sm btn--secondary" onclick="markOrderAsDone('${order.id}')">Mark as Done</button>` : ''
                             }
+
                         </div>
                     </div>
                     <div class="order-details">
