@@ -380,11 +380,11 @@
             `).join('');
         }
 
-        async function markOrderAsDone(orderId) { // Make it async
+        async function markOrderAsDone(orderId) {
             if (!confirm('Are you sure you want to mark this order as Done?')) {
                 return;
             }
-
+        
             try {
                 const response = await fetch(`${API_BASE_URL}/orders/${orderId}/status`, {
                     method: 'PUT',
@@ -392,9 +392,9 @@
                     body: JSON.stringify({ status: 'Done' })
                 });
                 if (!response.ok) throw new Error('Failed to update order status');
-
+        
                 showNotification(`Order #${orderId} marked as Done!`, 'success');
-                await fetchOrdersAdmin(); // Re-fetch to update UI
+                await fetchOrdersAdmin();
             } catch (error) {
                 console.error("Error marking order as done:", error);
                 showNotification('Error updating order status: ' + error.message, 'error');
