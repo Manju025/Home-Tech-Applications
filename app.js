@@ -571,6 +571,7 @@ async function processOrder(formData) {
     const total = currentProduct.price * quantity;
     
     const orderData = {
+        id: Date.now().toString(),
         productId: currentProduct.id,
         productName: currentProduct.name,
         quantity: quantity,
