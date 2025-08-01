@@ -938,7 +938,7 @@ select.form-control {
 }
 
 .product-card__image {
-  hieght: 260px;
+  height: 260px;
   padding-left:35px
   object-fit: cover;
 }
