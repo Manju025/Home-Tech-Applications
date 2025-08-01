@@ -345,8 +345,9 @@
 
         function renderOrdersList() {
             const container = document.getElementById('ordersList');
+            if (!container) return;
             
-            if (orders.length === 0) {
+            if (!orders || orders.length === 0) {
                 container.innerHTML = '<p style="text-align: center; color: var(--color-text-secondary);">No orders yet.</p>';
                 return;
             }
@@ -354,26 +355,21 @@
             container.innerHTML = orders.map(order => `
                 <div class="order-item-admin">
                     <div class="order-header">
-                        <span class="order-id">Order #${order.id || 'N/A'}</span>
-                        <div>
-                            <span class="order-status order-status--${(order.status || 'unknown').toLowerCase()}">${order.status || 'Unknown'}</span>
-                            ${(order.status || '').trim().toLowerCase() === 'pending' && order.id ?
-                                `<button class="btn btn--sm btn--secondary" onclick="markOrderAsDone('${order.id}')">Mark as Done</button>` : ''
-                            }
-                        </div>
+                        <span class="order-id">Order #${order.id}</span>
+                        <span class="order-status order-status--${order.status.toLowerCase()}">${order.status}</span>
                     </div>
                     <div class="order-details">
-                        <div><strong>Product:</strong> ${order.productName || 'N/A'}</div>
-                        <div><strong>Quantity:</strong> ${order.quantity || 'N/A'}</div>
-                        <div><strong>Customer:</strong> ${order.customerName || 'N/A'}</div>
-                        <div><strong>Phone:</strong> ${order.customerPhone || 'N/A'}</div>
-                        <div><strong>Date:</strong> ${order.orderDate || 'N/A'}</div>
-                        <div><strong>Total:</strong> ₹${(order.total || 0).toLocaleString()}</div>
+                        <div><strong>Product:</strong> ${order.productName}</div>
+                        <div><strong>Quantity:</strong> ${order.quantity}</div>
+                        <div><strong>Customer:</strong> ${order.customerName}</div>
+                        <div><strong>Phone:</strong> ${order.customerPhone}</div>
+                        <div><strong>Date:</strong> ${order.orderDate}</div>
+                        <div><strong>Total:</strong> ₹${order.total.toLocaleString()}</div>
                     </div>
                     <div style="margin-top: 12px;">
-                        <strong>Address:</strong> ${order.customerAddress || 'N/A'}
+                        <strong>Address:</strong> ${order.customerAddress}
                     </div>
-                    ${order.specialInstructions ?
+                    ${order.specialInstructions ? 
                         `<div style="margin-top: 8px;"><strong>Instructions:</strong> ${order.specialInstructions}</div>` : ''
                     }
                 </div>
