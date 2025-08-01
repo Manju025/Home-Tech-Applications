@@ -265,28 +265,32 @@ function renderProductsAdmin() {
     `).join('');
 }
 
+// Add this function to your app (2).js file
 async function deleteProduct(productId) {
-    if (!confirm('Are you sure you want to delete this product?')) return;
+    // Add this check to prevent API calls with undefined or invalid IDs
+    if (!productId || isNaN(productId)) {
+        console.error("Error: Attempted to delete a product with an invalid ID.");
+        showNotification('Error: Invalid product ID.', 'error');
+        return;
+    }
+
+    if (!confirm('Are you sure you want to delete this product?')) {
+        return;
+    }
 
     try {
         const response = await fetch(`${API_BASE_URL}/products/${productId}`, {
-            method: 'DELETE',
+            method: 'DELETE'
         });
-
         if (!response.ok) throw new Error('Failed to delete product');
 
         showNotification('Product deleted successfully!', 'success');
-
-        // Refetch products from backend
-        await fetchProductsApp();
-        renderProductsAdmin();
-
+        await fetchProductsAdmin(); // Re-fetch to update UI
     } catch (error) {
-        console.error('Error deleting product:', error);
-        showNotification('Failed to delete product.', 'error');
+        console.error("Error deleting product:", error);
+        showNotification('Error deleting product: ' + error.message, 'error');
     }
 }
-
 
 function renderOrdersList() {
     const container = document.getElementById('ordersList');
