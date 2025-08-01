@@ -196,25 +196,23 @@
                 .forEach(checkbox => selectedTechnologies.push(checkbox.value));
         
             if (selectedTechnologies.length === 0) {
-                alert('Please select at least one technology.');
+                showNotification('Please select at least one technology.', 'error');
                 return;
             }
         
             const newProductName = formData.get('productName').trim();
-            const newProductTags = selectedTechnologies.sort(); // Sort for consistent comparison
+            const newProductTags = selectedTechnologies.sort();
         
-            // --- START: New validation logic ---
             const productExists = products.some(product => {
-                const existingTags = product.tags.slice().sort(); // Sort for consistent comparison
+                const existingTags = product.tags.slice().sort();
                 const areTagsSame = JSON.stringify(newProductTags) === JSON.stringify(existingTags);
                 return product.name.trim().toLowerCase() === newProductName.toLowerCase() && areTagsSame;
             });
         
             if (productExists) {
                 showNotification(`${newProductName} is already added with these technologies. Try with different options.`, 'error');
-                return; // Stop the function from proceeding
+                return;
             }
-            // --- END: New validation logic ---
         
             const productImageInput = document.getElementById('productImageFile');
             const imageFile = productImageInput.files[0];
@@ -239,14 +237,13 @@
                 imageUrl = await processImage;
         
                 const newProduct = {
-                    id: Date.now(),
                     name: newProductName,
                     price: parseInt(formData.get('productPrice')),
                     image: imageUrl,
                     tags: selectedTechnologies,
                     isNewLaunch: formData.get('isNewLaunch') === 'on'
                 };
-                
+            
                 const response = await fetch(`${API_BASE_URL}/products`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -254,32 +251,31 @@
                 });
         
                 if (!response.ok) throw new Error('Failed to add product');
-                
+            
                 const addedProduct = await response.json();
-                
+            
                 showNotification('Product added successfully!', 'success');
-                
+            
                 addProductForm.reset();
-                
+            
                 const previewBox = document.getElementById('imagePreview');
                 if (previewBox) previewBox.style.display = 'none';
-                
+            
                 const hint = document.getElementById('imageHint');
                 if (hint) {
                     hint.textContent = 'Upload image (PNG/JPG < 5 MB)';
                     hint.style.color = 'var(--color-text-secondary)';
                 }
-                
+            
                 document.querySelectorAll('#technologyCheckboxes input[type="checkbox"]').forEach(cb => cb.checked = false);
         
                 await fetchProductsAdmin();
-                
+            
             } catch (error) {
                 console.error("Error adding product:", error);
                 showNotification('Error adding product: ' + error.message, 'error');
             }
         }
-
         // Replace your existing renderProductsAdmin function with this
         function renderProductsAdmin() {
             const container = document.getElementById('productsAdminGrid');
@@ -290,7 +286,6 @@
             }
         
             container.innerHTML = products.map(product => {
-                // Ensure product.id is a valid number before rendering the button
                 const productId = product.id;
                 const deleteButton = productId ?
                     `<button class="btn-delete" onclick="deleteProduct(${productId})">Delete</button>` :
@@ -354,32 +349,31 @@
             container.innerHTML = orders.map(order => `
                 <div class="order-item-admin">
                     <div class="order-header">
-                        <span class="order-id">Order #${order.id}</span>
+                        <span class="order-id">Order #${order.id || 'N/A'}</span>
                         <div>
-                            <span class="order-status order-status--${order.status.toLowerCase()}">${order.status}</span>
-                            ${order.status === 'Pending' ? 
+                            <span class="order-status order-status--${(order.status || 'unknown').toLowerCase()}">${order.status || 'Unknown'}</span>
+                            ${order.status === 'Pending' && order.id ?
                                 `<button class="btn btn--sm btn--secondary" onclick="markOrderAsDone('${order.id}')">Mark as Done</button>` : ''
                             }
                         </div>
                     </div>
                     <div class="order-details">
-                        <div><strong>Product:</strong> ${order.productName}</div>
-                        <div><strong>Quantity:</strong> ${order.quantity}</div>
-                        <div><strong>Customer:</strong> ${order.customerName}</div>
-                        <div><strong>Phone:</strong> ${order.customerPhone}</div>
-                        <div><strong>Date:</strong> ${order.orderDate}</div>
-                        <div><strong>Total:</strong> ₹${order.total.toLocaleString()}</div>
+                        <div><strong>Product:</strong> ${order.productName || 'N/A'}</div>
+                        <div><strong>Quantity:</strong> ${order.quantity || 'N/A'}</div>
+                        <div><strong>Customer:</strong> ${order.customerName || 'N/A'}</div>
+                        <div><strong>Phone:</strong> ${order.customerPhone || 'N/A'}</div>
+                        <div><strong>Date:</strong> ${order.orderDate || 'N/A'}</div>
+                        <div><strong>Total:</strong> ₹${(order.total || 0).toLocaleString()}</div>
                     </div>
                     <div style="margin-top: 12px;">
-                        <strong>Address:</strong> ${order.customerAddress}
+                        <strong>Address:</strong> ${order.customerAddress || 'N/A'}
                     </div>
-                    ${order.specialInstructions ? 
+                    ${order.specialInstructions ?
                         `<div style="margin-top: 8px;"><strong>Instructions:</strong> ${order.specialInstructions}</div>` : ''
                     }
                 </div>
             `).join('');
         }
-
         async function markOrderAsDone(orderId) {
             if (!confirm('Are you sure you want to mark this order as Done?')) {
                 return;
