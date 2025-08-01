@@ -598,7 +598,7 @@ async function processOrder(formData) {
         closeModal('orderModal');
 
         // Show success notification
-        const orderId = newOrder.id';
+        const orderId = newOrder.id;
         showNotification(`Order placed successfully! Order ID: #${orderId}`, 'success');
 
 
