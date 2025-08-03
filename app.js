@@ -202,7 +202,9 @@ async function addNewProduct(formData) {
         price: parseInt(formData.get('productPrice')),
         image: uploadedImageDataURL,
         tags: selectedTechnologies,
-        isNewLaunch: formData.get('isNewLaunch') === 'on'
+        isNewLaunch: formData.get('isNewLaunch') === 'on',
+        capacity: formData.get('capacity'),
+        warranty: formData.get('warranty')
     };
 
     try {
