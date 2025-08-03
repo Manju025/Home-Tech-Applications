@@ -1,5 +1,4 @@
-// server.js (Correct CommonJS style)
-require('dotenv').config(); // ✅ Environment variables
+require('dotenv').config();
 
 const express = require('express');
 const mongoose = require('mongoose');
@@ -9,7 +8,9 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 const MONGO_URI = process.env.MONGO_URI;
 
-// ✅ Better CORS setup for Netlify frontend
+console.log("🟢 Starting server...");
+console.log("🔐 MONGO_URI:", !!MONGO_URI);
+
 app.use(cors({
   origin: function (origin, callback) {
     const allowedOrigins = ['https://hometechapp.netlify.app'];
@@ -23,18 +24,15 @@ app.use(cors({
   credentials: true,
 }));
 
-app.options('*', cors()); // Handle preflight requests
+app.options('*', cors());
 
-// Middleware
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
-// Connect to MongoDB
 mongoose.connect(MONGO_URI)
   .then(() => console.log('✅ MongoDB connected successfully'))
   .catch(err => console.error('❌ MongoDB connection error:', err));
 
-// --- Mongoose Schemas ---
 const productSchema = new mongoose.Schema({
   id: Number,
   name: String,
@@ -63,7 +61,6 @@ const orderSchema = new mongoose.Schema({
 const Product = mongoose.model('Product', productSchema, 'products');
 const Order = mongoose.model('Order', orderSchema);
 
-// --- Routes ---
 app.get('/api/products', async (req, res) => {
   try {
     const products = await Product.find().sort({ createdAt: -1 });
@@ -74,9 +71,11 @@ app.get('/api/products', async (req, res) => {
 });
 
 app.post('/api/products', async (req, res) => {
+  console.log("📥 Incoming product data:", req.body); // DEBUG LOG
   const product = new Product(req.body);
   try {
     const saved = await product.save();
+    console.log("✅ Product saved:", saved); // DEBUG LOG
     res.status(201).json(saved);
   } catch (err) {
     console.error("❌ Error saving product:", err);
@@ -125,6 +124,7 @@ app.put('/api/orders/:id/status', async (req, res) => {
   }
 });
 
+// ✅ Catch-all health route (to avoid random /: path errors)
 app.get('/', (req, res) => {
   res.send('✅ Home Tech API is running!');
 });
