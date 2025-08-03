@@ -57,12 +57,22 @@
                             </label>
                         </div>
                         <div class="form-group">
-                            <label class="form-label">Capacity (Litres)</label>
-                            <input type="text" name="capacity" class="form-control" placeholder="e.g. 10-12 Litres">
-                        </div>
+                            <label class="form-label">Capacity</label>
+                            <select name="capacity" class="form-control" required>
+                                <option value="">Select capacity</option>
+                                <option value="8 Litres">8 Litres</option>
+                                <option value="10 Litres">10 Litres</option>
+                                <option value="12 Litres">12 Litres</option>
+                                <option value="14 Litres">14 Litres</option>
+                            </select>
                         <div class="form-group">
                             <label class="form-label">Warranty</label>
-                            <input type="text" name="warranty" class="form-control" placeholder="e.g. 2 Years">
+                            <select name="warranty" class="form-control" required>
+                                <option value="">Select warranty</option>
+                                <option value="1 Year">1 Year</option>
+                                <option value="2 Years">2 Years</option>
+                                <option value="3 Years">3 Years</option>
+                            </select>
                         </div>
                         <button type="submit" class="btn btn--primary">Add Product</button>
                     </form>
@@ -251,8 +261,8 @@
                     image: imageUrl,
                     tags: selectedTechnologies,
                     isNewLaunch: formData.get('isNewLaunch') === 'on',
-                    capacity: formData.get('capacity') || 'N/A',
-                    warranty: formData.get('warranty') || 'N/A'
+                    capacity: formData.get('capacity'),
+                    warranty: formData.get('warranty')
                 };
             
                 const response = await fetch(`${API_BASE_URL}/products`, {
@@ -313,8 +323,8 @@
                         </div>
                         <div class="product-admin-card__price">₹${product.price.toLocaleString()}</div>
                         <div class="product-details-extra">
-                            <p><strong>Capacity:</strong> ${product.capacity || 'N/A'}</p>
-                            <p><strong>Warranty:</strong> ${product.warranty || 'N/A'}</p>
+                            <p><strong>Capacity:</strong> ${product.capacity}</p>
+                            <p><strong>Warranty:</strong> ${product.warranty}</p>
                         </div>
                         <div class="product-technologies" style="margin-top: 12px;">
                             ${product.tags.map(tag => `<span class="tech-tag">${tag}</span>`).join('')}
