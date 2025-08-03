@@ -42,6 +42,8 @@ const productSchema = new mongoose.Schema({
   image: String,
   tags: [String],
   isNewLaunch: Boolean,
+  capacity: String,
+  warranty: String
 }, { timestamps: true });
 
 const orderSchema = new mongoose.Schema({

@@ -56,6 +56,14 @@
                                 <input type="checkbox" name="isNewLaunch"> Mark as New Launch
                             </label>
                         </div>
+                        <div class="form-group">
+                            <label class="form-label">Capacity (Litres)</label>
+                            <input type="text" name="capacity" class="form-control" placeholder="e.g. 10-12 Litres">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Warranty</label>
+                            <input type="text" name="warranty" class="form-control" placeholder="e.g. 2 Years">
+                        </div>
                         <button type="submit" class="btn btn--primary">Add Product</button>
                     </form>
                 </div>
@@ -242,7 +250,9 @@
                     price: parseInt(formData.get('productPrice')),
                     image: imageUrl,
                     tags: selectedTechnologies,
-                    isNewLaunch: formData.get('isNewLaunch') === 'on'
+                    isNewLaunch: formData.get('isNewLaunch') === 'on',
+                    capacity: formData.get('capacity') || 'N/A',
+                    warranty: formData.get('warranty') || 'N/A'
                 };
             
                 const response = await fetch(`${API_BASE_URL}/products`, {
@@ -302,6 +312,10 @@
                             ${product.isNewLaunch ? '<span class="status status--success">New Launch</span>' : ''}
                         </div>
                         <div class="product-admin-card__price">₹${product.price.toLocaleString()}</div>
+                        <div class="product-details-extra">
+                            <p><strong>Capacity:</strong> ${product.capacity || 'N/A'}</p>
+                            <p><strong>Warranty:</strong> ${product.warranty || 'N/A'}</p>
+                        </div>
                         <div class="product-technologies" style="margin-top: 12px;">
                             ${product.tags.map(tag => `<span class="tech-tag">${tag}</span>`).join('')}
                         </div>
@@ -438,6 +452,12 @@
                 justify-content: space-between;
                 align-items: center;
                 margin-bottom: var(--space-12);
+            }
+
+            .product-details-extra {
+                font-size: 12px;
+                color: var(--color-text-secondary);
+                margin-top: 8px;
             }
 
             .order-id {
