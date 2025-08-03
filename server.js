@@ -11,16 +11,14 @@ const MONGO_URI = process.env.MONGO_URI;
 console.log("🟢 Starting server...");
 console.log("🔐 MONGO_URI is loaded:", !!MONGO_URI);
 
-// ✅ Apply middleware
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
-
-// ✅ Simple & safe CORS config
 app.use(cors({
   origin: 'https://hometechapp.netlify.app',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type'],
 }));
+
 
 // ✅ Connect to MongoDB
 mongoose.connect(MONGO_URI)
