@@ -60,7 +60,7 @@ const orderSchema = new mongoose.Schema({
   status: { type: String, enum: ['Pending', 'Done'], default: 'Pending' },
 }, { timestamps: true });
 
-const Product = mongoose.model('Product', productSchema);
+const Product = mongoose.model('Product', productSchema, 'products');
 const Order = mongoose.model('Order', orderSchema);
 
 // --- Routes ---
