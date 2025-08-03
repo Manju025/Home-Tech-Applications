@@ -11,16 +11,15 @@ const MONGO_URI = process.env.MONGO_URI;
 console.log("🟢 Starting server...");
 console.log("🔐 MONGO_URI is loaded:", !!MONGO_URI);
 
+// ✅ Middleware
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
 app.use(cors({
   origin: 'https://hometechapp.netlify.app',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type'],
 }));
 
-
-// ✅ Connect to MongoDB
+// ✅ MongoDB
 mongoose.connect(MONGO_URI)
   .then(() => console.log('✅ MongoDB connected successfully'))
   .catch(err => console.error('❌ MongoDB connection error:', err));
@@ -33,8 +32,8 @@ const productSchema = new mongoose.Schema({
   image: String,
   tags: [String],
   isNewLaunch: Boolean,
-  capacity: String,      // ✅ added
-  warranty: String       // ✅ added
+  capacity: String,
+  warranty: String
 }, { timestamps: true });
 
 const orderSchema = new mongoose.Schema({
@@ -77,16 +76,6 @@ app.post('/api/products', async (req, res) => {
   }
 });
 
-app.delete('/api/products/:id', async (req, res) => {
-  try {
-    const result = await Product.deleteOne({ id: req.params.id });
-    if (result.deletedCount === 0) return res.status(404).json({ message: 'Not found' });
-    res.json({ message: 'Deleted' });
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-});
-
 app.get('/api/orders', async (req, res) => {
   try {
     const orders = await Order.find().sort({ createdAt: -1 });
@@ -118,14 +107,19 @@ app.put('/api/orders/:id/status', async (req, res) => {
   }
 });
 
-// ✅ Health route
-app.get('/', (req, res) => {
-  res.send('✅ Home Tech API is running!');
+app.delete('/api/products/:id', async (req, res) => {
+  try {
+    const result = await Product.deleteOne({ id: req.params.id });
+    if (result.deletedCount === 0) return res.status(404).json({ message: 'Not found' });
+    res.json({ message: 'Deleted' });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
 });
 
-// ✅ Catch-all route for safety
-app.get('*', (req, res) => {
-  res.status(404).send('🚫 Route not found');
+// ✅ HEALTH CHECK
+app.get('/', (req, res) => {
+  res.send('✅ Home Tech API is running!');
 });
 
 app.listen(PORT, () => {
