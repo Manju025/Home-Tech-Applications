@@ -9,31 +9,25 @@ const PORT = process.env.PORT || 5000;
 const MONGO_URI = process.env.MONGO_URI;
 
 console.log("🟢 Starting server...");
-console.log("🔐 MONGO_URI:", !!MONGO_URI);
+console.log("🔐 MONGO_URI is loaded:", !!MONGO_URI);
 
-app.use(express.json());
-app.use(cors({
-  origin: function (origin, callback) {
-    const allowedOrigins = ['https://hometechapp.netlify.app'];
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('CORS not allowed for this origin'));
-    }
-  },
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  credentials: true,
-}));
-
-app.options('*', cors());
-
-app.use(express.json());
+// ✅ Apply middleware
+app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
+// ✅ Simple & safe CORS config
+app.use(cors({
+  origin: 'https://hometechapp.netlify.app',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type'],
+}));
+
+// ✅ Connect to MongoDB
 mongoose.connect(MONGO_URI)
   .then(() => console.log('✅ MongoDB connected successfully'))
   .catch(err => console.error('❌ MongoDB connection error:', err));
 
+// ✅ Schemas
 const productSchema = new mongoose.Schema({
   id: Number,
   name: String,
@@ -41,8 +35,8 @@ const productSchema = new mongoose.Schema({
   image: String,
   tags: [String],
   isNewLaunch: Boolean,
-  capacity: String,
-  warranty: String
+  capacity: String,      // ✅ added
+  warranty: String       // ✅ added
 }, { timestamps: true });
 
 const orderSchema = new mongoose.Schema({
@@ -62,6 +56,7 @@ const orderSchema = new mongoose.Schema({
 const Product = mongoose.model('Product', productSchema, 'products');
 const Order = mongoose.model('Order', orderSchema);
 
+// ✅ Routes
 app.get('/api/products', async (req, res) => {
   try {
     const products = await Product.find().sort({ createdAt: -1 });
@@ -72,14 +67,14 @@ app.get('/api/products', async (req, res) => {
 });
 
 app.post('/api/products', async (req, res) => {
-  console.log("📥 Incoming product data:", req.body); // DEBUG LOG
+  console.log("📥 Incoming product:", req.body);
   const product = new Product(req.body);
   try {
     const saved = await product.save();
-    console.log("✅ Product saved:", saved); // DEBUG LOG
+    console.log("✅ Product saved:", saved);
     res.status(201).json(saved);
   } catch (err) {
-    console.error("❌ Error saving product:", err);
+    console.error("❌ Save error:", err);
     res.status(400).json({ message: err.message });
   }
 });
@@ -125,11 +120,12 @@ app.put('/api/orders/:id/status', async (req, res) => {
   }
 });
 
-// ✅ Catch-all health route (to avoid random /: path errors)
+// ✅ Health route
 app.get('/', (req, res) => {
   res.send('✅ Home Tech API is running!');
 });
 
+// ✅ Catch-all route for safety
 app.get('*', (req, res) => {
   res.status(404).send('🚫 Route not found');
 });
