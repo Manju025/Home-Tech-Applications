@@ -366,6 +366,11 @@ a:hover {
   color: var(--color-primary-hover);
 }
 
+.product-details-extra p {
+  margin: 2px 0;
+}
+
+
 code,
 pre {
   font-family: var(--font-family-mono);

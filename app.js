@@ -261,6 +261,10 @@ function renderProductsAdmin() {
                 ${product.tags.map(tag => `<span class="tech-tag">${tag}</span>`).join('')}
             </div>
             <img src="${product.image}" alt="${product.name}" style="width: 100%; height: 120px; object-fit: cover; border-radius: var(--radius-sm); margin-top: 12px;" onerror="this.src='https://via.placeholder.com/250'">
+            <div class="product-details-extra" style="font-size: 12px; color: var(--color-text-secondary); margin-top: 8px;">
+                <p><strong>Capacity:</strong> ${product.capacity || '—'}</p>
+                <p><strong>Warranty:</strong> ${product.warranty || '—'}</p>
+            </div>
         </div>
     `).join('');
 }
@@ -454,7 +458,7 @@ window.openProductModal = function(productId) {
                     </div>
                     <div class="spec-item">
                         <span class="spec-label">Capacity:</span>
-                        <span class="spec-value">8-12 Litres</span>
+                        <span class="spec-value">${product.capacity || '—'}</span>
                     </div>
                     <div class="spec-item">
                         <span class="spec-label">Power:</span>
@@ -462,7 +466,7 @@ window.openProductModal = function(productId) {
                     </div>
                     <div class="spec-item">
                         <span class="spec-label">Warranty:</span>
-                        <span class="spec-value">2-3 Years</span>
+                        <span class="spec-value">${product.warranty || '—'}</span>
                     </div>
                 </div>
             </div>
