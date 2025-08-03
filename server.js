@@ -26,7 +26,7 @@ app.use(cors({
 
 app.options('*', cors());
 
-app.use(express.json({ limit: '10mb' }));
+app.use(express.json());
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
 mongoose.connect(MONGO_URI)
