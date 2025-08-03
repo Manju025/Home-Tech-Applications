@@ -79,6 +79,7 @@ app.post('/api/products', async (req, res) => {
     const saved = await product.save();
     res.status(201).json(saved);
   } catch (err) {
+    console.error("❌ Error saving product:", err);
     res.status(400).json({ message: err.message });
   }
 });
