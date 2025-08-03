@@ -928,6 +928,7 @@ select.form-control {
   gap: var(--space-24);
 }
 
+/*
 . {
   background-color: var(--color-surface);
   border-radius: var(--radius-lg);
@@ -936,6 +937,8 @@ select.form-control {
   transition: all var(--duration-normal) var(--ease-standard);
   position: relative;
 }
+*/
+
 
 .product-card:hover {
   box-shadow: var(--shadow-lg);
